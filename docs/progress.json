@@ -1,0 +1,49 @@
+{
+  "project": {
+    "title": "E-Commerce DA Project",
+    "window_start": "2026-05-28",
+    "window_end": "2026-06-11",
+    "last_updated": "2026-06-05",
+    "content_days_total": 10,
+    "content_days_complete": 2,
+    "setup_complete": true
+  },
+  "velocity": {
+    "working_days_elapsed": 6,
+    "working_days_remaining": 5,
+    "project_days_remaining": 8,
+    "pace": 0.33,
+    "pace_target": 1.0,
+    "status": "behind",
+    "status_label": "Behind — need ~1.6 project days/day, or extend deadline"
+  },
+  "daily_log": [
+    { "date": "2026-05-28", "weekday": "Thu", "project_day": "Day 0", "status": "done", "notes": "Setup complete — BQ sandbox, first query, repo, Colab, Looker" },
+    { "date": "2026-05-29", "weekday": "Fri", "project_day": "Day 1", "status": "started", "notes": "Began data onboarding" },
+    { "date": "2026-05-30", "weekday": "Sat", "project_day": null, "status": "weekend", "notes": "Weekend" },
+    { "date": "2026-05-31", "weekday": "Sun", "project_day": null, "status": "weekend", "notes": "Weekend" },
+    { "date": "2026-06-01", "weekday": "Mon", "project_day": "Day 1", "status": "blocked", "notes": "Stuck on 1.2 — learning how to run queries in BigQuery UI" },
+    { "date": "2026-06-02", "weekday": "Tue", "project_day": "Day 1", "status": "in_progress", "notes": "Completed 1.4 (UNNEST worked examples)" },
+    { "date": "2026-06-03", "weekday": "Wed", "project_day": "Day 1", "status": "done", "notes": "Finished Day 1 — data_dictionary.md, profiling SQL" },
+    { "date": "2026-06-04", "weekday": "Thu", "project_day": "Day 2", "status": "done", "notes": "KPI tree, metric_definitions.md, baseline_metrics.sql" },
+    { "date": "2026-06-05", "weekday": "Fri", "project_day": "Day 3", "status": "today", "notes": "Today" }
+  ],
+  "deliverables": [
+    { "day": 0, "label": "BQ + repo + Colab + Looker working", "status": "done" },
+    { "day": 1, "label": "docs/data_dictionary.md + sql/01_data_profiling.sql", "status": "done" },
+    { "day": 2, "label": "docs/metric_definitions.md + sql/02_baseline_metrics.sql", "status": "done" },
+    { "day": 3, "label": "docs/findings_memo.md + sql/03_trend_decomposition.sql", "status": "pending" },
+    { "day": 4, "label": "sql/04_funnel_analysis.sql + funnel chart", "status": "pending" },
+    { "day": 5, "label": "python/segmentation.ipynb", "status": "pending" },
+    { "day": 6, "label": "dashboard/wireframe.png + BQ views", "status": "pending" },
+    { "day": 7, "label": "Looker Studio dashboard + public link", "status": "pending" },
+    { "day": 8, "label": "docs/experiment_brief.md", "status": "pending" },
+    { "day": 9, "label": "presentation/final_deck.pdf", "status": "pending" },
+    { "day": 10, "label": "Mock presentation + final repo package", "status": "pending" }
+  ],
+  "links": {
+    "repo": "https://github.com/webswift-engineering/DataProject",
+    "guide": "https://github.com/webswift-engineering/DataProject/blob/main/step_by_step_guide.md",
+    "brief": "https://github.com/webswift-engineering/DataProject/blob/main/project.md"
+  }
+}

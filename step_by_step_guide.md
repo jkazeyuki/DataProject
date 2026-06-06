@@ -1,9 +1,77 @@
 # Step-by-Step Walkthrough — E-Commerce DA Project
 
+
+[[project]]
 **Audience:** the analyst executing the project in `project.md`.
 **How to use this file:** Read `project.md` first to understand *what* you are producing each day and *why*. This file tells you exactly *how* — every click, every query, every common mistake.
 
 > If anything in this guide ever conflicts with `project.md`, the brief wins. This is the runbook.
+
+---
+
+## Progress tracker
+
+**Project window:** 2 weeks · May 28 – Jun 11, 2026 (Day 0 setup + 10 working days)  
+**Last updated:** Jun 5, 2026
+
+### Velocity snapshot
+
+| Metric | Value |
+|--------|-------|
+| Content days complete | **2 / 10** (Days 1–2) |
+| Setup (Day 0) | Done |
+| Working days elapsed | 6 (Thu May 28 → Thu Jun 4) |
+| Pace | ~0.33 project days / working day (target: **1.0**) |
+| Working days left in window | 5 (Fri Jun 5 → Thu Jun 11) |
+| Project days remaining | 8 (Days 3–10) |
+| Status | **Behind** — need ~1.6 project days/day, or extend the deadline |
+
+<progress value="2" max="10" title="2 of 10 content days complete"></progress>  
+*20% of content days done (Day 0 not counted above).*
+
+### Daily log
+
+Update this row each evening. One line per calendar day — even if you only made partial progress.
+
+| Date | Day | Project | Status | Notes |
+|------|-----|---------|--------|-------|
+| May 28 | Thu | Day 0 | Done | Setup complete — BQ sandbox, first query, repo, Colab, Looker |
+| May 29 | Fri | Day 1 | Started | Began data onboarding |
+| May 30–31 | Sat–Sun | — | — | Weekend |
+| Jun 1 | Mon | Day 1 | Blocked | Stuck on **1.2** — learning how to run queries in BigQuery UI |
+| Jun 2 | Tue | Day 1 | In progress | Completed **1.4** (UNNEST worked examples) |
+| Jun 3 | Wed | Day 1 | Done | Finished Day 1 — `data_dictionary.md`, profiling SQL |
+| Jun 4 | Thu | Day 2 | Done | KPI tree, `metric_definitions.md`, `baseline_metrics.sql` |
+| Jun 5 | Fri | Day 3 | — | *Today* |
+
+### Deliverable checklist
+
+Check off when the day's **Done when** criteria are met (see each day section below).
+
+| Day | Key deliverable | Status |
+|-----|-----------------|--------|
+| 0 | BQ + repo + Colab + Looker working | Done |
+| 1 | `docs/data_dictionary.md` + `sql/01_data_profiling.sql` | Done |
+| 2 | `docs/metric_definitions.md` + `sql/02_baseline_metrics.sql` | Done |
+| 3 | `docs/findings_memo.md` + `sql/03_trend_decomposition.sql` | — |
+| 4 | `sql/04_funnel_analysis.sql` + funnel chart | — |
+| 5 | `python/segmentation.ipynb` | — |
+| 6 | `dashboard/wireframe.png` + BQ views | — |
+| 7 | Looker Studio dashboard + public link | — |
+| 8 | `docs/experiment_brief.md` | — |
+| 9 | `presentation/final_deck.pdf` | — |
+| 10 | Mock presentation + final repo package | — |
+
+### How to keep this honest on GitHub Pages
+
+This repo renders as a static site on `github.io`. The lightest approach that actually works:
+
+1. **This table is your source of truth.** Edit `step_by_step_guide.md` once per day — GitHub Pages picks it up on push. No extra tooling.
+2. **Pair it with daily commits.** Use commit messages like `Day 3: trend decomposition memo` — your [commit graph](https://github.com/YOUR_USERNAME/DataProject/graph/commit-activity) becomes a free velocity chart.
+3. **Optional: GitHub Issues.** Create one issue per day (`Day 3 — Trend Decomposition`), close it when done. Milestones give you a burndown on the repo's **Issues** tab — useful if you want visuals without maintaining them by hand.
+4. **Skip fancy burndown charts in markdown** unless you add a Jekyll Mermaid plugin. Plain tables + the `<progress>` bar above render everywhere.
+
+**Rule of thumb for a 2-week sprint:** if pace drops below 1 project day per working day for more than two days in a row, message your project lead with the blocker — same as ground rule #2 in `project.md`.
 
 ---
 
