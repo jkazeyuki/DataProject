@@ -64,12 +64,11 @@ Check off when the day's **Done when** criteria are met (see each day section be
 
 ### How to keep this honest on GitHub Pages
 
-This repo renders as a static site on `github.io`. The lightest approach that actually works:
+**Live dashboard:** [webswift-engineering.github.io/DataProject](https://webswift-engineering.github.io/DataProject/)
 
-1. **This table is your source of truth.** Edit `step_by_step_guide.md` once per day — GitHub Pages picks it up on push. No extra tooling.
-2. **Pair it with daily commits.** Use commit messages like `Day 3: trend decomposition memo` — your [commit graph](https://github.com/YOUR_USERNAME/DataProject/graph/commit-activity) becomes a free velocity chart.
-3. **Optional: GitHub Issues.** Create one issue per day (`Day 3 — Trend Decomposition`), close it when done. Milestones give you a burndown on the repo's **Issues** tab — useful if you want visuals without maintaining them by hand.
-4. **Skip fancy burndown charts in markdown** unless you add a Jekyll Mermaid plugin. Plain tables + the `<progress>` bar above render everywhere.
+1. **Update `docs/progress.json` each evening** — the dashboard reads this file. Keep the tables above in sync (or treat JSON as source of truth and copy numbers here weekly).
+2. **Push to `main`.** GitHub Pages redeploys in ~1 minute.
+3. **Pair with daily commits** — messages like `Day 3: trend decomposition memo` give you a free [commit activity chart](https://github.com/webswift-engineering/DataProject/graph/commit-activity).
 
 **Rule of thumb for a 2-week sprint:** if pace drops below 1 project day per working day for more than two days in a row, message your project lead with the blocker — same as ground rule #2 in `project.md`.
 

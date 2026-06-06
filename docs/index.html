@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Progress — E-Commerce DA</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --surface2: #243044;
+      --text: #e7ecf3;
+      --muted: #8b9cb3;
+      --accent: #3b82f6;
+      --done: #22c55e;
+      --started: #eab308;
+      --blocked: #ef4444;
+      --progress: #6366f1;
+      --today: #38bdf8;
+      --border: #2d3a4f;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+    header { margin-bottom: 2rem; }
+    header h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em; }
+    header p { color: var(--muted); margin-top: 0.35rem; font-size: 0.95rem; }
+    .nav { display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+    .nav a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.875rem;
+    }
+    .nav a:hover { text-decoration: underline; }
+    .hero {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 2rem;
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 600px) {
+      .hero { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+    }
+    .ring-wrap { position: relative; width: 120px; height: 120px; }
+    .ring-wrap svg { transform: rotate(-90deg); }
+    .ring-bg { fill: none; stroke: var(--surface2); stroke-width: 10; }
+    .ring-fg { fill: none; stroke: var(--progress); stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset 0.6s ease; }
+    .ring-label {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .ring-label .pct { font-size: 1.75rem; font-weight: 700; }
+    .ring-label .sub { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .hero-stats h2 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.65rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.75rem;
+    }
+    .badge.behind { background: rgba(239,68,68,0.15); color: #f87171; }
+    .badge.on_track { background: rgba(34,197,94,0.15); color: #4ade80; }
+    .badge.ahead { background: rgba(56,189,248,0.15); color: #38bdf8; }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    .stat {
+      background: var(--surface2);
+      border-radius: 8px;
+      padding: 0.65rem 0.85rem;
+    }
+    .stat .val { font-size: 1.25rem; font-weight: 700; }
+    .stat .lbl { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+    .burndown {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .burndown h3 { font-size: 0.85rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; }
+    .burndown-bar { display: flex; gap: 3px; height: 28px; }
+    .burndown-bar .seg {
+      flex: 1;
+      border-radius: 4px;
+      background: var(--surface2);
+      position: relative;
+      min-width: 0;
+    }
+    .burndown-bar .seg.done { background: var(--done); }
+    .burndown-bar .seg.today { background: var(--today); box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--today); }
+    .burndown-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    section { margin-bottom: 1.5rem; }
+    section h3 {
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.85rem;
+    }
+    .timeline { display: flex; flex-direction: column; gap: 0; }
+    .tl-item {
+      display: grid;
+      grid-template-columns: 72px 12px 1fr;
+      gap: 0.75rem;
+      padding: 0.65rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .tl-item:last-child { border-bottom: none; }
+    .tl-date { font-size: 0.8rem; color: var(--muted); text-align: right; padding-top: 2px; }
+    .tl-dot {
+      width: 12px; height: 12px; border-radius: 50%;
+      margin-top: 5px;
+      background: var(--surface2);
+      border: 2px solid var(--border);
+    }
+    .tl-dot.done { background: var(--done); border-color: var(--done); }
+    .tl-dot.started, .tl-dot.in_progress { background: var(--started); border-color: var(--started); }
+    .tl-dot.blocked { background: var(--blocked); border-color: var(--blocked); }
+    .tl-dot.today { background: var(--today); border-color: var(--today); box-shadow: 0 0 0 3px rgba(56,189,248,0.25); }
+    .tl-dot.weekend { background: transparent; border-color: var(--border); opacity: 0.4; }
+    .tl-body .day-tag { font-size: 0.75rem; font-weight: 600; color: var(--accent); }
+    .tl-body .notes { font-size: 0.875rem; margin-top: 0.15rem; }
+    .tl-body .status-pill {
+      display: inline-block;
+      font-size: 0.65rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      margin-left: 0.4rem;
+      vertical-align: middle;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.65rem; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      font-size: 0.85rem;
+    }
+    .card.done { border-left: 3px solid var(--done); }
+    .card.pending { border-left: 3px solid var(--surface2); opacity: 0.75; }
+    .card .day-num { font-weight: 700; font-size: 0.75rem; color: var(--muted); }
+    .card .label { margin-top: 0.25rem; line-height: 1.35; }
+    footer {
+      margin-top: 2.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    footer code { background: var(--surface2); padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.75rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1 id="title">Loading…</h1>
+      <p id="subtitle"></p>
+      <nav class="nav" id="nav"></nav>
+    </header>
+
+    <div class="hero" id="hero"></div>
+
+    <div class="burndown">
+      <h3>10-day burndown</h3>
+      <div class="burndown-bar" id="burndown"></div>
+      <div class="burndown-labels"><span>Day 1</span><span>Day 10</span></div>
+    </div>
+
+    <section>
+      <h3>Daily log</h3>
+      <div class="timeline" id="timeline"></div>
+    </section>
+
+    <section>
+      <h3>Deliverables</h3>
+      <div class="cards" id="cards"></div>
+    </section>
+
+    <footer>
+      Update <code>docs/progress.json</code> each evening, then <code>git push</code>.
+      Last updated: <span id="updated"></span>
+    </footer>
+  </div>
+
+  <script>
+    const STATUS_LABELS = {
+      done: 'Done', started: 'Started', in_progress: 'In progress',
+      blocked: 'Blocked', today: 'Today', weekend: '—', pending: 'Pending'
+    };
+
+    function fmtDate(iso) {
+      const d = new Date(iso + 'T12:00:00');
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    function fmtRange(start, end) {
+      const s = new Date(start + 'T12:00:00');
+      const e = new Date(end + 'T12:00:00');
+      const opts = { month: 'short', day: 'numeric', year: 'numeric' };
+      return s.toLocaleDateString('en-US', opts) + ' – ' + e.toLocaleDateString('en-US', opts);
+    }
+
+    function ringSVG(pct) {
+      const r = 50, c = 2 * Math.PI * r;
+      const offset = c * (1 - pct / 100);
+      return `
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <circle class="ring-bg" cx="60" cy="60" r="${r}"/>
+          <circle class="ring-fg" cx="60" cy="60" r="${r}"
+            stroke-dasharray="${c}" stroke-dashoffset="${offset}"/>
+        </svg>`;
+    }
+
+    async function load() {
+      const res = await fetch('progress.json');
+      const data = await res.json();
+      const p = data.project;
+      const v = data.velocity;
+      const pct = Math.round((p.content_days_complete / p.content_days_total) * 100);
+
+      document.getElementById('title').textContent = p.title;
+      document.getElementById('subtitle').textContent =
+        `2-week sprint · ${fmtRange(p.window_start, p.window_end)}` +
+        (p.setup_complete ? ' · Day 0 setup done' : '');
+      document.getElementById('updated').textContent = fmtDate(p.last_updated);
+
+      const nav = document.getElementById('nav');
+      nav.innerHTML = `
+        <a href="${data.links.repo}" target="_blank" rel="noopener">GitHub repo</a>
+        <a href="${data.links.brief}">Project brief</a>
+        <a href="${data.links.guide}">Step-by-step guide</a>`;
+
+      const badgeClass = v.status === 'on_track' ? 'on_track' : v.status === 'ahead' ? 'ahead' : 'behind';
+      document.getElementById('hero').innerHTML = `
+        <div class="ring-wrap">
+          ${ringSVG(pct)}
+          <div class="ring-label">
+            <span class="pct">${pct}%</span>
+            <span class="sub">${p.content_days_complete} / ${p.content_days_total} days</span>
+          </div>
+        </div>
+        <div class="hero-stats">
+          <span class="badge ${badgeClass}">${v.status_label}</span>
+          <h2>Velocity</h2>
+          <div class="stat-grid">
+            <div class="stat"><div class="val">${v.pace}</div><div class="lbl">Pace (days/day)</div></div>
+            <div class="stat"><div class="val">${v.pace_target}</div><div class="lbl">Target pace</div></div>
+            <div class="stat"><div class="val">${v.working_days_elapsed}</div><div class="lbl">Days elapsed</div></div>
+            <div class="stat"><div class="val">${v.working_days_remaining}</div><div class="lbl">Days left</div></div>
+            <div class="stat"><div class="val">${v.project_days_remaining}</div><div class="lbl">Project days left</div></div>
+          </div>
+        </div>`;
+
+      const burndown = document.getElementById('burndown');
+      for (let d = 1; d <= 10; d++) {
+        const del = data.deliverables.find(x => x.day === d);
+        const seg = document.createElement('div');
+        seg.className = 'seg' + (del?.status === 'done' ? ' done' : '');
+        seg.title = `Day ${d}: ${del?.label || ''}`;
+        burndown.appendChild(seg);
+      }
+
+      const timeline = document.getElementById('timeline');
+      data.daily_log.forEach(entry => {
+        if (entry.status === 'weekend' && !entry.notes) return;
+        const item = document.createElement('div');
+        item.className = 'tl-item';
+        item.innerHTML = `
+          <div class="tl-date">${fmtDate(entry.date)}<br>${entry.weekday}</div>
+          <div class="tl-dot ${entry.status}"></div>
+          <div class="tl-body">
+            ${entry.project_day ? `<span class="day-tag">${entry.project_day}</span>` : ''}
+            <span class="status-pill">${STATUS_LABELS[entry.status] || entry.status}</span>
+            <div class="notes">${entry.notes}</div>
+          </div>`;
+        timeline.appendChild(item);
+      });
+
+      const cards = document.getElementById('cards');
+      data.deliverables.forEach(del => {
+        const card = document.createElement('div');
+        card.className = `card ${del.status}`;
+        card.innerHTML = `
+          <div class="day-num">Day ${del.day}</div>
+          <div class="label">${del.label}</div>`;
+        cards.appendChild(card);
+      });
+    }
+
+    load().catch(err => {
+      document.getElementById('title').textContent = 'Failed to load progress.json';
+      document.getElementById('subtitle').textContent = err.message;
+    });
+  </script>
+</body>
+</html>
