@@ -183,13 +183,14 @@
       "bases:Create new base": false
     }
   },
-  "active": "46b213d2a4472b5f",
+  "active": "5eadaf4e1bbf9107",
   "lastOpenFiles": [
     "README.md",
+    "project.md",
+    "step_by_step_guide.md",
     "docs/index.html",
     "Data Journey.docx",
     "docs/progress.json",
-    "docs",
-    "step_by_step_guide.md"
+    "docs"
   ]
 }

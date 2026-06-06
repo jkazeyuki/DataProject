@@ -16,15 +16,15 @@
 
 ### Velocity snapshot
 
-| Metric | Value |
-|--------|-------|
-| Content days complete | **2 / 10** (Days 1–2) |
-| Setup (Day 0) | Done |
-| Working days elapsed | 6 (Thu May 28 → Thu Jun 4) |
-| Pace | ~0.33 project days / working day (target: **1.0**) |
-| Working days left in window | 5 (Fri Jun 5 → Thu Jun 11) |
-| Project days remaining | 8 (Days 3–10) |
-| Status | **Behind** — need ~1.6 project days/day, or extend the deadline |
+| Metric                      | Value                                                           |
+| --------------------------- | --------------------------------------------------------------- |
+| Content days complete       | **2 / 10** (Days 1–2)                                           |
+| Setup (Day 0)               | Done                                                            |
+| Working days elapsed        | 6 (Thu May 28 → Thu Jun 4)                                      |
+| Pace                        | ~0.33 project days / working day (target: **1.0**)              |
+| Working days left in window | 5 (Fri Jun 5 → Thu Jun 11)                                      |
+| Project days remaining      | 8 (Days 3–10)                                                   |
+| Status                      | **Behind** — need ~1.6 project days/day, or extend the deadline |
 
 <progress value="2" max="10" title="2 of 10 content days complete"></progress>  
 *20% of content days done (Day 0 not counted above).*
@@ -33,16 +33,17 @@
 
 Update this row each evening. One line per calendar day — even if you only made partial progress.
 
-| Date | Day | Project | Status | Notes |
-|------|-----|---------|--------|-------|
-| May 28 | Thu | Day 0 | Done | Setup complete — BQ sandbox, first query, repo, Colab, Looker |
-| May 29 | Fri | Day 1 | Started | Began data onboarding |
-| May 30–31 | Sat–Sun | — | — | Weekend |
-| Jun 1 | Mon | Day 1 | Blocked | Stuck on **1.2** — learning how to run queries in BigQuery UI |
-| Jun 2 | Tue | Day 1 | In progress | Completed **1.4** (UNNEST worked examples) |
-| Jun 3 | Wed | Day 1 | Done | Finished Day 1 — `data_dictionary.md`, profiling SQL |
-| Jun 4 | Thu | Day 2 | Done | KPI tree, `metric_definitions.md`, `baseline_metrics.sql` |
-| Jun 5 | Fri | Day 3 | — | *Today* |
+| Date      | Day     | Project | Status      | Notes                                                         |
+| --------- | ------- | ------- | ----------- | ------------------------------------------------------------- |
+| May 28    | Thu     | Day 0   | Done        | Setup complete — BQ sandbox, first query, repo, Colab, Looker |
+| May 29    | Fri     | Day 1   | Started     | Began data onboarding                                         |
+| May 30–31 | Sat–Sun | —       | —           | Weekend                                                       |
+| Jun 1     | Mon     | Day 1   | Blocked     | Stuck on **1.2** — learning how to run queries in BigQuery UI |
+| Jun 2     | Tue     | Day 1   | In progress | Completed **1.4** (UNNEST worked examples)                    |
+| Jun 3     | Wed     | Day 1   | Done        | Finished Day 1 — `data_dictionary.md`, profiling SQL          |
+| Jun 4     | Thu     | Day 2   | Done        | KPI tree, `metric_definitions.md`, `baseline_metrics.sql`     |
+| Jun 5     | Fri     | Day 3   | —           | *Today*                                                       |
+|           |         |         |             |                                                               |
 
 ### Deliverable checklist
 
@@ -190,9 +191,9 @@ You will need this for Days 6 & 7.
 
 ### 0.9 Sanity-check Day 0 is complete
 
-- [ ] You can run the query in 0.5 and see results.
-- [ ] You can `git push` an empty README to your repo (or save a file to your Drive folder).
-- [ ] You can open Colab and Looker Studio and see their main UIs.
+- [x] You can run the query in 0.5 and see results.
+- [x] You can `git push` an empty README to your repo (or save a file to your Drive folder).
+- [x] You can open Colab and Looker Studio and see their main UIs.
 
 If all three boxes are checked, you are ready for Day 1. **Message your project lead with a screenshot of the Day 0.5 query result** — that's your "I have access" confirmation.
 
