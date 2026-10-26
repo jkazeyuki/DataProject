@@ -1,0 +1,112 @@
+// ============================================================
+// Power BI DAX — E-Commerce Revenue Diagnostic
+// Tables: fact_sessions (from pbi_fact_sessions), 'Date', user_segments, 'Funnel Steps'
+// Create each block via Modeling → New table / New measure.
+// ============================================================
+
+// ---------- Calculated tables ----------
+
+// 1) Date table. After creating: Table tools → Mark as date table → 'Date'[Date].
+//    Relationship: 'Date'[Date] 1 → * fact_sessions[session_date]
+Date =
+ADDCOLUMNS (
+    CALENDAR ( DATE ( 2020, 11, 1 ), DATE ( 2021, 1, 31 ) ),
+    "Week Start", [Date] - WEEKDAY ( [Date], 2 ) + 1,
+    "Month", FORMAT ( [Date], "YYYY-MM" ),
+    "Period", IF ( [Date] <= DATE ( 2020, 12, 31 ), "Holiday (Nov–Dec)", "Post-holiday (Jan)" )
+)
+
+// 2) Funnel steps (disconnected table — no relationship).
+Funnel Steps =
+DATATABLE (
+    "Step Order", INTEGER,
+    "Step", STRING,
+    {
+        { 1, "Session" },
+        { 2, "View item" },
+        { 3, "Add to cart" },
+        { 4, "Begin checkout" },
+        { 5, "Purchase" }
+    }
+)
+
+// ---------- Core measures (put them in a _Measures table) ----------
+
+Sessions = COUNTROWS ( fact_sessions )
+
+Users = DISTINCTCOUNT ( fact_sessions[user_pseudo_id] )
+
+Revenue = SUM ( fact_sessions[revenue] )
+
+Purchases = SUM ( fact_sessions[purchases] )
+
+Sessions with Purchase =
+CALCULATE ( [Sessions], fact_sessions[has_purchase] = 1 )
+
+Conversion Rate = DIVIDE ( [Sessions with Purchase], [Sessions] )
+
+AOV = DIVIDE ( [Revenue], [Purchases] )
+
+Revenue per Session = DIVIDE ( [Revenue], [Sessions] )
+
+// ---------- Trailing 4 weeks vs prior 4 weeks ----------
+// Anchored to the last date in the current date-slicer selection
+// (= 2021-01-31 when nothing is filtered).
+
+Revenue per Session T4W =
+VAR _end = MAX ( 'Date'[Date] )
+RETURN
+    CALCULATE (
+        [Revenue per Session],
+        REMOVEFILTERS ( 'Date' ),
+        DATESBETWEEN ( 'Date'[Date], _end - 27, _end )
+    )
+
+Revenue per Session P4W =
+VAR _end = MAX ( 'Date'[Date] ) - 28
+RETURN
+    CALCULATE (
+        [Revenue per Session],
+        REMOVEFILTERS ( 'Date' ),
+        DATESBETWEEN ( 'Date'[Date], _end - 27, _end )
+    )
+
+Revenue per Session Δ% =
+DIVIDE ( [Revenue per Session T4W] - [Revenue per Session P4W], [Revenue per Session P4W] )
+
+// Same pattern for the other KPI cards — copy the three measures above and
+// swap [Revenue per Session] for [Revenue], [Sessions], [Conversion Rate], [AOV].
+
+// Card colour (Format → Callout value → fx → Field value):
+KPI Δ Colour =
+IF ( [Revenue per Session Δ%] >= 0, "#1A7F37", "#CF222E" )
+
+// ---------- Funnel ----------
+// Visual: Funnel. Category = 'Funnel Steps'[Step] (sort by Step Order), Values = [Funnel Sessions]
+
+Funnel Sessions =
+SWITCH (
+    SELECTEDVALUE ( 'Funnel Steps'[Step Order] ),
+    1, [Sessions],
+    2, CALCULATE ( [Sessions], fact_sessions[has_view_item] = 1 ),
+    3, CALCULATE ( [Sessions], fact_sessions[has_add_to_cart] = 1 ),
+    4, CALCULATE ( [Sessions], fact_sessions[has_begin_checkout] = 1 ),
+    5, [Sessions with Purchase]
+)
+
+Funnel % of Sessions =
+DIVIDE ( [Funnel Sessions], CALCULATE ( [Funnel Sessions], 'Funnel Steps'[Step Order] = 1 ) )
+
+// Biggest single drop-off, for a text card / tooltip
+Step-to-Step Drop % =
+VAR _order = SELECTEDVALUE ( 'Funnel Steps'[Step Order] )
+VAR _prev = CALCULATE ( [Funnel Sessions], 'Funnel Steps'[Step Order] = _order - 1 )
+RETURN
+    IF ( _order > 1, 1 - DIVIDE ( [Funnel Sessions], _prev ) )
+
+// ---------- Segments (Day 5 output) ----------
+// user_segments: user_pseudo_id, segment  (CSV exported from the Colab notebook)
+// Relationship: user_segments[user_pseudo_id] 1 → * fact_sessions[user_pseudo_id]
+
+Revenue Share % =
+DIVIDE ( [Revenue], CALCULATE ( [Revenue], REMOVEFILTERS ( user_segments ) ) )

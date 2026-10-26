@@ -57,8 +57,8 @@ Check off when the day's **Done when** criteria are met (see each day section be
 | 3 | `docs/findings_memo.md` + `sql/03_trend_decomposition.sql` | — |
 | 4 | `sql/04_funnel_analysis.sql` + funnel chart | — |
 | 5 | `python/segmentation.ipynb` | — |
-| 6 | `dashboard/wireframe.png` + BQ views | — |
-| 7 | Looker Studio dashboard + public link | — |
+| 6 | `dashboard/wireframe.png` + Power BI data model ([Power BI track](powerbi/README.md)) | — |
+| 7 | Power BI dashboard (`.pbix`) + screenshots | — |
 | 8 | `docs/experiment_brief.md` | — |
 | 9 | `presentation/final_deck.pdf` | — |
 | 10 | Mock presentation + final repo package | — |
@@ -879,6 +879,8 @@ For each, write one specific action a marketing team could take.
 ---
 
 ## Day 6 — Dashboard Architecture & Data Layer
+
+> **Power BI track:** follow [`powerbi/README.md`](powerbi/README.md) for Days 6–7 instead of the Looker Studio steps below. §6.1 (wireframe) still applies.
 
 Goal: a wireframe sketch + 2–3 BigQuery views ready for Looker Studio.
 

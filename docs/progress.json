@@ -35,8 +35,8 @@
     { "day": 3, "label": "docs/findings_memo.md + sql/03_trend_decomposition.sql", "status": "pending" },
     { "day": 4, "label": "sql/04_funnel_analysis.sql + funnel chart", "status": "pending" },
     { "day": 5, "label": "python/segmentation.ipynb", "status": "pending" },
-    { "day": 6, "label": "dashboard/wireframe.png + BQ views", "status": "pending" },
-    { "day": 7, "label": "Looker Studio dashboard + public link", "status": "pending" },
+    { "day": 6, "label": "dashboard/wireframe.png + powerbi/pbi_fact_sessions.sql + Power BI data model", "status": "pending" },
+    { "day": 7, "label": "Power BI dashboard (.pbix) + screenshots", "status": "pending" },
     { "day": 8, "label": "docs/experiment_brief.md", "status": "pending" },
     { "day": 9, "label": "presentation/final_deck.pdf", "status": "pending" },
     { "day": 10, "label": "Mock presentation + final repo package", "status": "pending" }
