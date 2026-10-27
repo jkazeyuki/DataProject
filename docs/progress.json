@@ -5,7 +5,7 @@
     "window_end": "2026-06-11",
     "last_updated": "2026-06-05",
     "content_days_total": 10,
-    "content_days_complete": 2,
+    "content_days_complete": 3,
     "setup_complete": true
   },
   "velocity": {
@@ -26,13 +26,13 @@
     { "date": "2026-06-02", "weekday": "Tue", "project_day": "Day 1", "status": "in_progress", "notes": "Completed 1.4 (UNNEST worked examples)" },
     { "date": "2026-06-03", "weekday": "Wed", "project_day": "Day 1", "status": "done", "notes": "Finished Day 1 — data_dictionary.md, profiling SQL" },
     { "date": "2026-06-04", "weekday": "Thu", "project_day": "Day 2", "status": "done", "notes": "KPI tree, metric_definitions.md, baseline_metrics.sql" },
-    { "date": "2026-06-05", "weekday": "Fri", "project_day": "Day 3", "status": "today", "notes": "Today" }
+    { "date": "2026-06-05", "weekday": "Fri", "project_day": "Day 3", "status": "done", "notes": "Trend decomposition + findings_memo.md (completed Oct 27): returning-user rate effect = 77% of RPS drop" }
   ],
   "deliverables": [
     { "day": 0, "label": "BQ + repo + Colab + Looker working", "status": "done" },
     { "day": 1, "label": "docs/data_dictionary.md + sql/01_data_profiling.sql", "status": "done" },
     { "day": 2, "label": "docs/metric_definitions.md + sql/02_baseline_metrics.sql", "status": "done" },
-    { "day": 3, "label": "docs/findings_memo.md + sql/03_trend_decomposition.sql", "status": "pending" },
+    { "day": 3, "label": "docs/findings_memo.md + sql/03_trend_decomposition.sql", "status": "done" },
     { "day": 4, "label": "sql/04_funnel_analysis.sql + funnel chart", "status": "pending" },
     { "day": 5, "label": "python/segmentation.ipynb", "status": "pending" },
     { "day": 6, "label": "dashboard/wireframe.png + powerbi/pbi_fact_sessions.sql + Power BI data model", "status": "pending" },
