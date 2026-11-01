@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YourFashion Jewelry Sales</title>
+<meta name="description" content="Multi-currency sales report for a jewelry brand (2018–2020): 6 countries, 29 business lines, 287 products. Built in Power BI, mirrored on the web.">
+<style>
+:root {
+  color-scheme: light;
+  --page: #f9f9f7;
+  --surface: #fcfcfb;
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --muted: #898781;
+  --grid: #e1e0d9;
+  --axis: #c3c2b7;
+  --border: rgba(11,11,11,0.10);
+  --accent: #2a78d6;
+  --context: #c3c2b7;
+  --pos: #2a78d6;
+  --neg: #e34948;
+  --cat-1: #2a78d6;
+  --cat-2: #eb6834;
+  --cat-3: #1baf7a;
+  --good-text: #006300;
+  --bad-text: #b42323;
+  --chip: #eeede8;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0d0d0d;
+    --surface: #1a1a19;
+    --ink: #f0efec;
+    --ink-2: #c3c2b7;
+    --muted: #898781;
+    --grid: #2c2c2a;
+    --axis: #383835;
+    --border: rgba(255,255,255,0.10);
+    --accent: #3987e5;
+    --context: #5a5955;
+    --pos: #3987e5;
+    --neg: #e66767;
+    --cat-1: #3987e5;
+    --cat-2: #d95926;
+    --cat-3: #199e70;
+    --good-text: #0ca30c;
+    --bad-text: #e66767;
+    --chip: #2c2c2a;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d;
+  --surface: #1a1a19;
+  --ink: #f0efec;
+  --ink-2: #c3c2b7;
+  --muted: #898781;
+  --grid: #2c2c2a;
+  --axis: #383835;
+  --border: rgba(255,255,255,0.10);
+  --accent: #3987e5;
+  --context: #5a5955;
+  --pos: #3987e5;
+  --neg: #e66767;
+  --cat-1: #3987e5;
+  --cat-2: #d95926;
+  --cat-3: #199e70;
+  --good-text: #0ca30c;
+  --bad-text: #e66767;
+  --chip: #2c2c2a;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--page);
+  color: var(--ink);
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+a { color: var(--accent); }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 32px 16px 64px; }
+header h1 { font-size: 28px; line-height: 1.2; margin: 0 0 6px; font-weight: 650; letter-spacing: -0.01em; }
+header p { margin: 0; color: var(--ink-2); max-width: 760px; }
+.byline { font-size: 13px; color: var(--muted); margin-top: 8px !important; }
+.filters { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: end; margin: 28px 0 16px; }
+.filters label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--ink-2); }
+select, .seg button {
+  font: inherit; font-size: 14px; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  padding: 6px 10px; min-height: 34px;
+}
+.seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; cursor: pointer; background: var(--surface); color: var(--ink-2); }
+.seg button[aria-pressed="true"] { background: var(--chip); color: var(--ink); font-weight: 600; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 12px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; min-width: 0; }
+.kpi .label { font-size: 13px; color: var(--ink-2); }
+.kpi .value { font-size: 30px; font-weight: 600; line-height: 1.2; margin-top: 4px; }
+.kpi .delta { font-size: 13px; margin-top: 4px; color: var(--ink-2); }
+.kpi .delta b { font-weight: 600; }
+.up { color: var(--good-text); }
+.down { color: var(--bad-text); }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.span-2 { grid-column: 1 / -1; }
+@media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } .span-2 { grid-column: auto; } }
+.card h2 { font-size: 15px; font-weight: 600; margin: 0; }
+.card .sub { font-size: 13px; color: var(--ink-2); margin: 2px 0 10px; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12px; color: var(--ink-2); margin-bottom: 6px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.key-line { width: 16px; height: 2px; border-radius: 1px; display: inline-block; }
+.key-rect { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.chart { width: 100%; position: relative; }
+.chart svg { display: block; width: 100%; overflow: visible; }
+.chart text { font-size: 11px; fill: var(--muted); font-variant-numeric: tabular-nums; }
+.chart text.lbl { fill: var(--ink-2); }
+.chart text.val { fill: var(--ink); }
+.note { font-size: 12px; color: var(--muted); margin: 8px 0 0; }
+details { margin-top: 8px; font-size: 13px; }
+summary { cursor: pointer; color: var(--ink-2); }
+table { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+th, td { padding: 6px 8px; border-bottom: 1px solid var(--grid); text-align: right; white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { color: var(--ink-2); font-weight: 600; }
+.table-scroll { overflow-x: auto; }
+#tip {
+  position: fixed; pointer-events: none; z-index: 10; display: none;
+  background: var(--surface); color: var(--ink); border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 10px; font-size: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  min-width: 140px;
+}
+#tip .t { color: var(--ink-2); margin-bottom: 4px; }
+#tip .row { display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+#tip .row b { font-weight: 600; font-variant-numeric: tabular-nums; }
+#tip .row span { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); }
+.hit { fill: transparent; cursor: default; }
+.bar:hover, .bar:focus { opacity: 0.8; outline: none; }
+section.story { margin-top: 40px; }
+section.story h2 { font-size: 20px; margin: 0 0 12px; }
+.findings { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+.findings .card h3 { font-size: 15px; margin: 0 0 6px; }
+.findings .card p { margin: 0; color: var(--ink-2); font-size: 14px; }
+.method { columns: 2 320px; column-gap: 32px; color: var(--ink-2); font-size: 14px; }
+.method h3 { color: var(--ink); font-size: 15px; margin: 0 0 4px; break-after: avoid; }
+.method p, .method ul { margin: 0 0 16px; break-inside: avoid; }
+.method ul { padding-left: 18px; }
+code { font-size: 12.5px; background: var(--chip); padding: 1px 5px; border-radius: 4px; }
+footer { margin-top: 40px; font-size: 13px; color: var(--muted); }
+#err { display: none; }
+.ccy { font-weight: 600; color: var(--ink); }
+tr.sel td { font-weight: 600; color: var(--ink); background: var(--chip); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>YourFashion — Jewelry Sales Report 2018–2020</h1>
+    <p>Weekly sales for 287 jewelry products sold through 29 business lines in 6 countries, reported in any of 7 currencies. Built in Power BI (Power Query cleaning, star schema, DAX currency conversion and time intelligence); this page mirrors the report so it can be opened from any browser.</p>
+    <p class="byline">Case study · Power BI / DAX · <a href="https://github.com/jkazeyuki/DataProject/tree/main/powerbi_case3">Source, DAX and build notes on GitHub</a></p>
+  </header>
+
+  <div class="card" id="err" role="alert">Could not load <code>data.json</code>. Open this page through a web server (GitHub Pages or <code>python -m http.server</code>), not as a local file.</div>
+
+  <div class="filters" role="group" aria-label="Filters">
+    <label>Year
+      <select id="f-year">
+        <option value="2020">2020</option>
+        <option value="2019">2019</option>
+        <option value="2018">2018</option>
+      </select>
+    </label>
+    <label>Currency
+      <select id="f-ccy"></select>
+    </label>
+    <label>Country
+      <select id="f-country"><option value="all">All countries</option></select>
+    </label>
+    <label>Subcategory
+      <select id="f-sub"><option value="all">All subcategories</option></select>
+    </label>
+    <label>Weeks
+      <span class="seg" id="f-weeks">
+        <button type="button" data-v="all" aria-pressed="true">All weeks</button>
+        <button type="button" data-v="52" aria-pressed="false">Comparable 52 weeks</button>
+      </span>
+    </label>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="grid">
+    <div class="card span-2">
+      <h2 id="trend-title">Weekly sales</h2>
+      <p class="sub" id="trend-sub"></p>
+      <div class="legend" id="trend-legend"></div>
+      <div class="chart" id="trend"></div>
+      <p class="note">ISO weeks. 2020 has a 53rd week (28 Dec 2020 – 3 Jan 2021) that 2018 and 2019 don't have. Switch <b>Weeks → Comparable 52 weeks</b> to remove it from every number on this page.</p>
+      <details><summary>Show table</summary><div class="table-scroll" id="trend-table"></div></details>
+    </div>
+
+    <div class="card">
+      <h2 id="country-title">Sales by country</h2>
+      <p class="sub">Sales by country · share of total</p>
+      <div class="chart" id="countries"></div>
+      <details><summary>Show table</summary><div class="table-scroll" id="countries-table"></div></details>
+    </div>
+
+    <div class="card">
+      <h2 id="yoy-title">Growth by country</h2>
+      <p class="sub" id="yoy-sub">Year-over-year % by country</p>
+      <div class="legend"><span><i class="key-rect" style="background:var(--pos)"></i>Growth</span><span><i class="key-rect" style="background:var(--neg)"></i>Decline</span></div>
+      <div class="chart" id="yoy"></div>
+      <details><summary>Show table</summary><div class="table-scroll" id="yoy-table"></div></details>
+    </div>
+
+    <div class="card">
+      <h2 id="sub-title">Sales by subcategory</h2>
+      <p class="sub" id="sub-sub">Sales · share · YoY</p>
+      <div class="chart" id="subs"></div>
+      <details><summary>Show table</summary><div class="table-scroll" id="subs-table"></div></details>
+    </div>
+
+    <div class="card">
+      <h2 id="bl-title">Best-selling business lines</h2>
+      <p class="sub">Top 5 business lines by units sold</p>
+      <div class="chart" id="bls"></div>
+      <details><summary>Show table</summary><div class="table-scroll" id="bls-table"></div></details>
+    </div>
+
+    <div class="card">
+      <h2>Top 3 products</h2>
+      <p class="sub">By sales</p>
+      <div class="chart" id="top3"></div>
+    </div>
+
+    <div class="card">
+      <h2>Bottom 3 products</h2>
+      <p class="sub">By sales, among products that sold at least once</p>
+      <div class="chart" id="bottom3"></div>
+      <p class="note" id="zero-note"></p>
+    </div>
+
+    <div class="card span-2">
+      <h2 id="cohort-title">Sales by product launch year</h2>
+      <p class="sub">Which product generations the year's sales come from</p>
+      <div class="chart" id="cohort"></div>
+      <details><summary>Show table</summary><div class="table-scroll" id="cohort-table"></div></details>
+    </div>
+
+    <div class="card span-2">
+      <h2>Same sales, different growth: YoY depends on the currency</h2>
+      <p class="sub" id="ccy-sub"></p>
+      <div class="table-scroll" id="ccy"></div>
+      <p class="note">Sales are recorded in DKK. Each year is converted at that year's average rate (DKK per 100 units), as the DAX measure does with <code>LOOKUPVALUE</code>. When a currency strengthens against DKK, growth in that currency looks smaller.</p>
+    </div>
+
+    <div class="card span-2">
+      <h2>Time intelligence</h2>
+      <p class="sub" id="ti-sub"></p>
+      <div class="table-scroll" id="ti"></div>
+      <p class="note">Months come from the company's week calendar (4-4-5 weeks per quarter), not calendar dates. In 2020 the extra week moves week 48, the Black Friday week, from December into November, so compare <b>Nov + Dec together</b>. In Power BI these are DAX measures (<code>DATESYTD</code>, <code>DATEADD</code>).</p>
+    </div>
+  </div>
+
+  <section class="story">
+    <h2>What the data says</h2>
+    <div class="findings">
+      <div class="card"><h3>1 · 2020 grew 9.4% — but a third of that is an extra week</h3><p>2020 sales were 2.71B DKK vs 2.48B in 2019 (+9.4%). 2020 has 53 ISO weeks; week 53 alone is 71M DKK. On a comparable 52 weeks, growth is <b>+6.5%</b>. Units grew only +1.1% on 52 weeks, so growth came from a higher average price (161 → 170 DKK), not from more pieces sold.</p></div>
+      <div class="card"><h3>2 · The peak moved earlier</h3><p>Q4 is almost half of the year (48% of 2020 sales). In 2020, weeks 44–48 (up to and including Black Friday week) were <b>+25%</b> vs 2019, while weeks 49–52 were <b>−19%</b>. The monthly view shows "November +85%, December −25%", which is mostly the week calendar moving Black Friday week into November.</p></div>
+      <div class="card"><h3>3 · Charms are the business, but growth came from elsewhere</h3><p>Charms are 67% of 2020 sales and were flat (−0.3%). Bracelets (+41%) and Dangles (+47%) delivered the growth. Dangles and Necklaces barely existed in 2018 and are new lines.</p></div>
+      <div class="card"><h3>4 · Fast product turnover</h3><p>62% of 2020 sales came from products launched in 2020 and 33% from 2019 launches. Almost nothing older than two years still sells. 31 of 272 selling products make 80% of sales, and the top product (P 84) alone is 7.6%.</p></div>
+      <div class="card"><h3>5 · Two markets and one business line dominate</h3><p>Australia (31%) and China (31%) make 62% of sales. Business line BL 1 in China sells 27% of all units, about 3× the next one. The USA (+16%) and Spain (+12%) grew fastest; Australia was slowest (+7%).</p></div>
+      <div class="card"><h3>Recommendation</h3><p>Report growth on comparable weeks and a fixed currency. Plan inventory and marketing around a Black-Friday-led peak, not December. Keep the launch pipeline strong, since sales depend on products less than two years old. Reduce dependence on BL 1 by growing the USA and Spain.</p></div>
+    </div>
+  </section>
+
+  <section class="story">
+    <h2>How it was built</h2>
+    <div class="method">
+      <h3>1. Data audit and Power Query</h3>
+      <ul>
+        <li>542,605 weekly rows. Removed 5,480 rows with invalid keys (<code>#</code> business line, <code>'</code> product).</li>
+        <li>Kept units as decimals (the source has fractional units; a whole-number type would round them).</li>
+        <li>Parsed launch dates written as <code>dd.mm.yyyy</code> and list prices with a Danish decimal format; <code>#</code> prices set to 0.</li>
+        <li>Product 99 sells (198K DKK) but is missing from the product list, so it shows as unknown.</li>
+      </ul>
+      <h3>2. Star schema</h3>
+      <p>One fact table (<code>FactSalesOverview</code>) with <code>DimProduct</code>, <code>DimBusinessLine</code>, a week calendar that maps ISO week → month, and a <code>DimDate</code> date table. The yearly exchange rates link to <code>DimDate</code> and a <code>DimCurrency</code> slicer table.</p>
+      <h3>3. DAX measures</h3>
+      <ul>
+        <li><b>Currency conversion</b>: look up the selected currency's rate for the year (<code>LOOKUPVALUE</code>) and divide the DKK amount by rate ÷ 100</li>
+        <li>Units, <b>ASP</b> = Sales ÷ Units</li>
+        <li><b>YTD / LY / LM, YoY % and MoM %</b> with <code>DATESYTD</code> and <code>DATEADD</code></li>
+      </ul>
+      <h3>4. Report</h3>
+      <p>Cover, overview, time-intelligence page with country bookmarks, sales-details page with a map, Top/Bottom N and a report-page tooltip. This web version recomputes the same measures in the browser from an aggregated extract (<code>data.json</code>).</p>
+    </div>
+  </section>
+
+  <footer>Data: Power BI training case 3 (fictional jewelry brand "YourFashion", anonymised products and business lines). Amounts recorded in DKK.</footer>
+</div>
+<div id="tip" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  "use strict";
+  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const state = { year: 2020, ccy: "DKK", country: "all", sub: "all", weeks: "all" };
+  let D, blCountry, subIdx;
+
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const el = (tag, attrs, parent) => {
+    const ns = ["svg","g","path","line","rect","text","circle"].includes(tag) ? "http://www.w3.org/2000/svg" : null;
+    const n = ns ? document.createElementNS(ns, tag) : document.createElement(tag);
+    for (const k in attrs || {}) {
+      if (k === "text") n.textContent = attrs[k];
+      else n.setAttribute(k, attrs[k]);
+    }
+    if (parent) parent.appendChild(n);
+    return n;
+  };
+  const compact = (v) => {
+    const a = Math.abs(v);
+    if (a >= 1e9) return (v / 1e9).toFixed(2) + "B";
+    if (a >= 1e6) return (v / 1e6).toFixed(a >= 1e8 ? 0 : 1) + "M";
+    if (a >= 1e3) return (v / 1e3).toFixed(a >= 1e5 ? 0 : 1) + "K";
+    return Math.round(v).toLocaleString("en-US");
+  };
+  const int = (v) => Math.round(v).toLocaleString("en-US");
+  const pct = (v, d = 1) => (v * 100).toFixed(d) + "%";
+  const spct = (v, d = 1) => (v >= 0 ? "+" : "−") + Math.abs(v * 100).toFixed(d) + "%";
+  const niceMax = (v) => {
+    if (v <= 0) return 1;
+    const p = Math.pow(10, Math.floor(Math.log10(v)));
+    for (const m of [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]) if (m * p >= v) return m * p;
+    return 10 * p;
+  };
+
+  // ---------- tooltip ----------
+  const tip = document.getElementById("tip");
+  function showTip(evt, title, rows) {
+    tip.replaceChildren();
+    el("div", { class: "t", text: title }, tip);
+    for (const r of rows) {
+      const row = el("div", { class: "row" }, tip);
+      const s = el("span", {}, row);
+      if (r.color) el("i", { class: "key-line", style: "background:" + r.color }, s);
+      s.appendChild(document.createTextNode(r.label));
+      el("b", { text: r.value }, row);
+    }
+    tip.style.display = "block";
+    let x, y;
+    if (evt.clientX !== undefined && evt.type !== "focus") { x = evt.clientX; y = evt.clientY; }
+    else { const b = evt.target.getBoundingClientRect(); x = b.left + b.width / 2; y = b.top; }
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    x = Math.min(x + 14, window.innerWidth - w - 8);
+    y = Math.max(8, Math.min(y - h - 10, window.innerHeight - h - 8));
+    tip.style.left = x + "px"; tip.style.top = y + "px";
+  }
+  const hideTip = () => { tip.style.display = "none"; };
+
+  // ---------- data helpers ----------
+  // Same logic as the DAX TotalSales measure: DKK ÷ (rate ÷ 100), using the row's own year.
+  const conv = (dkk, yr, ccy) => dkk / (D.rates[ccy || state.ccy][String(yr)] / 100);
+  const subOk = (sub) => state.sub === "all" || sub === subIdx[state.sub];
+  const countryOk = (c) => state.country === "all" || D.countries[c] === state.country;
+  const prodSub = (pn) => (D.product_info[pn] ? subIdx[D.product_info[pn][1]] : -1);
+  const prodName = (pn) => (D.product_info[pn] ? D.product_info[pn][0] : "P " + pn + " (not in product list)");
+
+  // weekly: [yr, wk, country, sub, s, q]
+  const weekly = (yr) => D.weekly.filter((r) => (yr === undefined || r[0] === yr) && countryOk(r[2]) && subOk(r[3]) && (state.weeks === "all" || r[1] !== 53));
+  // lines: [yr, bl, sub, w53, s, q]
+  const lines = (yr) => D.lines.filter((r) => r[0] === yr && countryOk(D.countries.indexOf(blCountry[r[1]])) && subOk(r[2]) && (state.weeks === "all" || !r[3]));
+  // products: [yr, country, pn, w53, s, q]
+  const prods = (yr) => D.products.filter((r) => r[0] === yr && countryOk(r[1]) && subOk(prodSub(r[2])) && (state.weeks === "all" || !r[3]));
+
+  function sum(rs, ccy) {
+    const t = { s: 0, q: 0 };
+    for (const r of rs) { t.s += conv(r[4], r[0], ccy); t.q += r[5]; }
+    return t;
+  }
+  function groupBy(rs, keyFn) {
+    const m = new Map();
+    for (const r of rs) {
+      const k = keyFn(r);
+      if (!m.has(k)) m.set(k, []);
+      m.get(k).push(r);
+    }
+    return m;
+  }
+  const hasPrior = () => state.year > 2018;
+
+  // ---------- table helper ----------
+  function table(host, head, body, selRow) {
+    host.replaceChildren();
+    const t = el("table", {}, host);
+    const tr = el("tr", {}, el("thead", {}, t));
+    head.forEach((h) => el("th", { text: h, scope: "col" }, tr));
+    const tb = el("tbody", {}, t);
+    body.forEach((r, i) => { const row = el("tr", i === selRow ? { class: "sel" } : {}, tb); r.forEach((c) => el("td", { text: c }, row)); });
+  }
+
+  // ---------- horizontal bar chart ----------
+  function hbars(host, items, opts) {
+    host.replaceChildren();
+    if (!items.length) { el("p", { class: "note", text: "No data for this selection." }, host); return; }
+    const W = host.clientWidth || 500;
+    const labelW = Math.min(opts.labelW || 118, W * 0.34), valW = opts.valW || 64, rowH = 30, barH = 18;
+    const top = 6, axisH = 22, H = top + items.length * rowH + axisH;
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, height: H, role: "img", "aria-label": opts.aria }, host);
+    const min = opts.min !== undefined ? opts.min : 0;
+    const max = opts.max;
+    const x0 = labelW + 8, x1 = W - valW;
+    const sx = (v) => x0 + ((v - min) / (max - min)) * (x1 - x0);
+    const ticks = opts.ticks || [0, max / 2, max];
+    ticks.forEach((t) => {
+      el("line", { x1: sx(t), x2: sx(t), y1: top, y2: H - axisH, stroke: css("--grid"), "stroke-width": 1 }, svg);
+      el("text", { x: sx(t), y: H - 6, "text-anchor": "middle", text: opts.fmtAxis(t) }, svg);
+    });
+    const base = sx(Math.max(min, 0));
+    el("line", { x1: base, x2: base, y1: top, y2: H - axisH, stroke: css("--axis"), "stroke-width": 1 }, svg);
+    items.forEach((it, i) => {
+      const y = top + i * rowH + (rowH - barH) / 2;
+      el("text", { x: labelW, y: y + barH / 2 + 4, "text-anchor": "end", class: "lbl", text: it.label }, svg);
+      const xv = sx(it.value);
+      const a = Math.min(base, xv), b = Math.max(base, xv), w = b - a, r = Math.min(4, w);
+      let d;
+      if (it.value >= 0) d = `M${a},${y}H${b - r}Q${b},${y} ${b},${y + r}V${y + barH - r}Q${b},${y + barH} ${b - r},${y + barH}H${a}Z`;
+      else d = `M${b},${y}H${a + r}Q${a},${y} ${a},${y + r}V${y + barH - r}Q${a},${y + barH} ${a + r},${y + barH}H${b}Z`;
+      el("path", { d, fill: it.color, class: "bar" }, svg);
+      const tx = it.value >= 0 ? b + 6 : a - 6;
+      el("text", { x: tx, y: y + barH / 2 + 4, "text-anchor": it.value >= 0 ? "start" : "end", class: "val", text: it.text }, svg);
+      const hit = el("rect", { x: 0, y: top + i * rowH, width: W, height: rowH, class: "hit", tabindex: 0, "aria-label": it.label + ": " + it.text }, svg);
+      const show = (e) => showTip(e, it.label, it.tip);
+      hit.addEventListener("pointermove", show);
+      hit.addEventListener("focus", show);
+      hit.addEventListener("pointerleave", hideTip);
+      hit.addEventListener("blur", hideTip);
+    });
+  }
+
+  // ---------- weekly line chart (series values may contain null) ----------
+  function lineChart(host, series, n) {
+    host.replaceChildren();
+    const W = host.clientWidth || 800, H = 280, m = { t: 12, r: 44, b: 26, l: 48 };
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, height: H, role: "img", "aria-label": "Weekly sales by year" }, host);
+    const max = niceMax(Math.max(1, ...series.flatMap((s) => s.values.filter((v) => v !== null))));
+    const sx = (i) => m.l + (i / (n - 1)) * (W - m.l - m.r);
+    const sy = (v) => H - m.b - (v / max) * (H - m.t - m.b);
+    for (let k = 0; k <= 4; k++) {
+      const v = (max / 4) * k;
+      el("line", { x1: m.l, x2: W - m.r, y1: sy(v), y2: sy(v), stroke: k ? css("--grid") : css("--axis"), "stroke-width": 1 }, svg);
+      el("text", { x: m.l - 8, y: sy(v) + 4, "text-anchor": "end", text: compact(v) }, svg);
+    }
+    const step = W < 520 ? 8 : 4;
+    for (let i = 0; i < n; i += step) el("text", { x: sx(i), y: H - 8, "text-anchor": "middle", text: "W" + (i + 1) }, svg);
+    series.forEach((s) => {
+      let d = "", pen = false, last = -1;
+      s.values.forEach((v, i) => {
+        if (v === null) { pen = false; return; }
+        d += (pen ? "L" : "M") + sx(i) + "," + sy(v); pen = true; last = i;
+      });
+      el("path", { d, fill: "none", stroke: s.color, "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }, svg);
+      if (last >= 0) {
+        el("circle", { cx: sx(last), cy: sy(s.values[last]), r: 4, fill: s.color, stroke: css("--surface"), "stroke-width": 2 }, svg);
+        el("text", { x: sx(last) + 8, y: sy(s.values[last]) + 4, class: "lbl", text: s.name }, svg);
+      }
+    });
+    const cross = el("line", { y1: m.t, y2: H - m.b, stroke: css("--axis"), "stroke-width": 1, visibility: "hidden" }, svg);
+    const dots = series.map((s) => el("circle", { r: 4, fill: s.color, stroke: css("--surface"), "stroke-width": 2, visibility: "hidden" }, svg));
+    const hit = el("rect", { x: m.l - 10, y: 0, width: W - m.l - m.r + 20, height: H, class: "hit", tabindex: 0, "aria-label": "Weekly sales; use arrow keys" }, svg);
+    let cur = 47;
+    const at = (i, e) => {
+      cur = i;
+      cross.setAttribute("x1", sx(i)); cross.setAttribute("x2", sx(i)); cross.setAttribute("visibility", "visible");
+      series.forEach((s, k) => {
+        const v = s.values[i];
+        dots[k].setAttribute("visibility", v === null ? "hidden" : "visible");
+        if (v !== null) { dots[k].setAttribute("cx", sx(i)); dots[k].setAttribute("cy", sy(v)); }
+      });
+      const rowsT = series.map((s) => ({ label: s.name, value: s.values[i] === null ? "–" : compact(s.values[i]), color: s.color }));
+      if (series.length > 1 && series[0].values[i] && series[1].values[i]) rowsT.push({ label: "YoY", value: spct(series[0].values[i] / series[1].values[i] - 1) });
+      showTip(e, "Week " + (i + 1), rowsT);
+    };
+    hit.addEventListener("pointermove", (e) => {
+      const r = svg.getBoundingClientRect();
+      const px = (e.clientX - r.left) * (W / r.width);
+      at(Math.max(0, Math.min(n - 1, Math.round(((px - m.l) / (W - m.l - m.r)) * (n - 1)))), e);
+    });
+    hit.addEventListener("focus", (e) => at(cur, e));
+    hit.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+        e.preventDefault();
+        at(Math.max(0, Math.min(n - 1, cur + (e.key === "ArrowRight" ? 1 : -1))), { target: hit, type: "focus" });
+      }
+    });
+    const off = () => { hideTip(); cross.setAttribute("visibility", "hidden"); dots.forEach((d) => d.setAttribute("visibility", "hidden")); };
+    hit.addEventListener("pointerleave", off);
+    hit.addEventListener("blur", off);
+  }
+
+  // ---------- render ----------
+  function renderKpis() {
+    const yr = state.year;
+    const a = sum(weekly(yr)), b = hasPrior() ? sum(weekly(yr - 1)) : null;
+    const dl = (cur, prev) => {
+      if (!b || !prev) return null;
+      const ch = cur / prev - 1;
+      return { text: spct(ch), cls: ch >= 0 ? "up" : "down" };
+    };
+    const tiles = [
+      { label: "Total sales (" + state.ccy + ")", value: compact(a.s), d: dl(a.s, b && b.s) },
+      { label: "Units sold", value: compact(a.q), d: dl(a.q, b && b.q) },
+      { label: "Average selling price (" + state.ccy + ")", value: a.q ? (a.s / a.q).toFixed(1) : "–", d: dl(a.s / a.q, b && b.s / b.q) },
+    ];
+    const w53 = yr === 2020 && state.weeks === "all" ? sum(weekly(2020).filter((r) => r[1] === 53)).s : 0;
+    const host = document.getElementById("kpis");
+    host.replaceChildren();
+    tiles.forEach((k) => {
+      const c = el("div", { class: "card kpi" }, host);
+      el("div", { class: "label", text: k.label }, c);
+      el("div", { class: "value", text: k.value }, c);
+      const d = el("div", { class: "delta" }, c);
+      if (k.d) {
+        el("b", { class: k.d.cls, text: k.d.text }, d);
+        d.appendChild(document.createTextNode(" vs " + (yr - 1)));
+      } else d.textContent = "First year of data";
+    });
+    const c = el("div", { class: "card kpi" }, host);
+    el("div", { class: "label", text: "Week 53 effect" }, c);
+    el("div", { class: "value", text: w53 ? compact(w53) : "–" }, c);
+    el("div", { class: "delta", text: w53 ? pct(w53 / a.s) + " of " + yr + " sales" : (yr === 2020 ? "Excluded (comparable 52 weeks)" : "No week 53 in " + yr) }, c);
+  }
+
+  function weeklySeries(yr) {
+    const v = Array(53).fill(null);
+    for (const r of weekly(yr)) v[r[1] - 1] = (v[r[1] - 1] || 0) + conv(r[4], r[0]);
+    for (let i = 0; i < 52; i++) if (v[i] === null) v[i] = 0;
+    return v;
+  }
+
+  function renderTrend() {
+    const yr = state.year;
+    const cur = weeklySeries(yr), prev = hasPrior() ? weeklySeries(yr - 1) : null;
+    const series = [{ name: String(yr), values: cur, color: css("--accent") }];
+    if (prev) series.push({ name: String(yr - 1), values: prev, color: css("--context") });
+    const sumR = (v, a, b) => v.slice(a - 1, b).reduce((s, x) => s + (x || 0), 0);
+    let title = "Weekly sales, " + yr + (prev ? " vs " + (yr - 1) : "");
+    if (prev) {
+      const early = sumR(cur, 44, 48) / sumR(prev, 44, 48) - 1, late = sumR(cur, 49, 52) / sumR(prev, 49, 52) - 1;
+      title = `Weeks 44–48 ${spct(early, 0)}, weeks 49–52 ${spct(late, 0)} vs ${yr - 1}`;
+    }
+    document.getElementById("trend-title").textContent = title;
+    const q4 = sumR(cur, 40, 53) / cur.reduce((s, x) => s + (x || 0), 0);
+    document.getElementById("trend-sub").textContent = `Sales per ISO week in ${state.ccy} · ${yr} highlighted${prev ? ", " + (yr - 1) + " for context" : ""} · weeks 40+ are ${pct(q4, 0)} of the year`;
+    const lg = document.getElementById("trend-legend");
+    lg.replaceChildren();
+    series.forEach((s) => { const sp = el("span", {}, lg); el("i", { class: "key-line", style: "background:" + s.color }, sp); sp.appendChild(document.createTextNode(s.name)); });
+    lineChart(document.getElementById("trend"), series, 53);
+    table(document.getElementById("trend-table"), ["Week", String(yr), prev ? String(yr - 1) : "", prev ? "YoY" : ""],
+      cur.map((v, i) => ["W" + (i + 1), v === null ? "–" : int(v), prev ? (prev[i] === null ? "–" : int(prev[i])) : "", prev && v && prev[i] ? spct(v / prev[i] - 1) : ""]));
+  }
+
+  function renderCountries() {
+    const rs = weekly(state.year);
+    const tot = sum(rs).s;
+    const g = [...groupBy(rs, (r) => r[2])].map(([c, v]) => ({ c, t: sum(v) })).sort((a, b) => b.t.s - a.t.s);
+    if (g.length >= 2) document.getElementById("country-title").textContent =
+      `${D.countries[g[0].c]} and ${D.countries[g[1].c]} are ${pct((g[0].t.s + g[1].t.s) / tot, 0)} of sales`;
+    else document.getElementById("country-title").textContent = "Sales by country";
+    const max = niceMax(Math.max(1, ...g.map((x) => x.t.s)));
+    hbars(document.getElementById("countries"), g.map((x) => ({
+      label: D.countries[x.c], value: x.t.s, color: css("--accent"), text: compact(x.t.s) + " · " + pct(x.t.s / tot, 0),
+      tip: [{ label: "Sales", value: compact(x.t.s) }, { label: "Share", value: pct(x.t.s / tot) }, { label: "Units", value: compact(x.t.q) }, { label: "ASP", value: (x.t.s / x.t.q).toFixed(1) }],
+    })), { max, fmtAxis: compact, aria: "Sales by country" });
+    table(document.getElementById("countries-table"), ["Country", "Sales", "Share", "Units", "ASP"],
+      g.map((x) => [D.countries[x.c], int(x.t.s), pct(x.t.s / tot), int(x.t.q), (x.t.s / x.t.q).toFixed(1)]));
+  }
+
+  function renderYoy() {
+    const host = document.getElementById("yoy"), tbl = document.getElementById("yoy-table");
+    if (!hasPrior()) {
+      document.getElementById("yoy-title").textContent = "Growth by country";
+      host.replaceChildren(); el("p", { class: "note", text: "2018 is the first year of data, so there is no prior year to compare." }, host);
+      tbl.replaceChildren(); return;
+    }
+    const yr = state.year;
+    const g = D.countries.map((name, c) => {
+      const a = sum(weekly(yr).filter((r) => r[2] === c)).s, b = sum(weekly(yr - 1).filter((r) => r[2] === c)).s;
+      return { name, a, b, ch: b ? a / b - 1 : 0 };
+    }).filter((x) => x.b > 0 && countryOk(D.countries.indexOf(x.name))).sort((x, y) => y.ch - x.ch);
+    document.getElementById("yoy-title").textContent = g.length ? `${g[0].name} grew fastest (${spct(g[0].ch, 0)})` : "Growth by country";
+    document.getElementById("yoy-sub").textContent = `Year-over-year % by country, ${yr} vs ${yr - 1}, in ${state.ccy}`;
+    const m = Math.ceil(Math.max(0.2, ...g.map((x) => Math.abs(x.ch))) * 10) / 10;
+    hbars(host, g.map((x) => ({
+      label: x.name, value: x.ch, color: x.ch >= 0 ? css("--pos") : css("--neg"), text: spct(x.ch, 0),
+      tip: [{ label: String(yr), value: compact(x.a) }, { label: String(yr - 1), value: compact(x.b) }, { label: "YoY", value: spct(x.ch) }],
+    })), { min: -m, max: m, ticks: [-m, 0, m], fmtAxis: (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(Math.round(v * 100)) + "%", aria: "Growth by country" });
+    table(tbl, ["Country", String(yr - 1), String(yr), "YoY"], g.map((x) => [x.name, int(x.b), int(x.a), spct(x.ch)]));
+  }
+
+  function renderSubs() {
+    const yr = state.year, rs = weekly(yr), tot = sum(rs).s;
+    const prev = hasPrior() ? weekly(yr - 1) : [];
+    const g = [...groupBy(rs, (r) => r[3])].filter(([s]) => s >= 0).map(([s, v]) => {
+      const t = sum(v), b = sum(prev.filter((r) => r[3] === s)).s;
+      return { name: D.subcats[s], t, b, ch: b ? t.s / b - 1 : null };
+    }).sort((a, b) => b.t.s - a.t.s);
+    if (g.length) document.getElementById("sub-title").textContent = `${g[0].name} are ${pct(g[0].t.s / tot, 0)} of sales` + (g[0].ch !== null ? ` (${spct(g[0].ch, Math.abs(g[0].ch) < 0.01 ? 1 : 0)} YoY)` : "");
+    document.getElementById("sub-sub").textContent = "Sales · share" + (hasPrior() ? " · YoY vs " + (yr - 1) : "");
+    const max = niceMax(Math.max(1, ...g.map((x) => x.t.s)));
+    hbars(document.getElementById("subs"), g.map((x) => ({
+      label: x.name, value: x.t.s, color: css("--accent"), valW: 120,
+      text: compact(x.t.s) + " · " + pct(x.t.s / tot, 0) + (x.ch !== null ? " · " + spct(x.ch, 0) : ""),
+      tip: [{ label: "Sales", value: compact(x.t.s) }, { label: "Share", value: pct(x.t.s / tot) }, { label: "YoY", value: x.ch !== null ? spct(x.ch) : "–" }, { label: "ASP", value: (x.t.s / x.t.q).toFixed(1) }],
+    })), { max, valW: 128, fmtAxis: compact, aria: "Sales by subcategory" });
+    table(document.getElementById("subs-table"), ["Subcategory", "Sales", "Share", "YoY", "Units", "ASP"],
+      g.map((x) => [x.name, int(x.t.s), pct(x.t.s / tot), x.ch !== null ? spct(x.ch) : "–", int(x.t.q), (x.t.s / x.t.q).toFixed(1)]));
+  }
+
+  function renderBLs() {
+    const rs = lines(state.year);
+    const totQ = rs.reduce((s, r) => s + r[5], 0);
+    const g = [...groupBy(rs, (r) => r[1])].map(([no, v]) => ({ no, t: sum(v) })).sort((a, b) => b.t.q - a.t.q).slice(0, 5);
+    const name = (no) => D.business_lines.find((b) => b.no === no).name;
+    if (g.length) document.getElementById("bl-title").textContent = `${name(g[0].no)} (${blCountry[g[0].no]}) sells ${pct(g[0].t.q / totQ, 0)} of all units`;
+    const max = niceMax(Math.max(1, ...g.map((x) => x.t.q)));
+    hbars(document.getElementById("bls"), g.map((x) => ({
+      label: name(x.no) + " · " + blCountry[x.no], value: x.t.q, color: css("--accent"), text: compact(x.t.q),
+      tip: [{ label: "Units", value: int(x.t.q) }, { label: "Share of units", value: pct(x.t.q / totQ) }, { label: "Sales", value: compact(x.t.s) }],
+    })), { max, labelW: 140, fmtAxis: compact, aria: "Top 5 business lines by units" });
+    table(document.getElementById("bls-table"), ["Business line", "Country", "Units", "Share of units", "Sales"],
+      g.map((x) => [name(x.no), blCountry[x.no], int(x.t.q), pct(x.t.q / totQ), int(x.t.s)]));
+  }
+
+  function renderProducts() {
+    const rs = prods(state.year);
+    const g = [...groupBy(rs, (r) => r[2])].map(([pn, v]) => ({ pn, t: sum(v) })).filter((x) => x.t.s > 0).sort((a, b) => b.t.s - a.t.s);
+    const item = (x) => {
+      const info = D.product_info[x.pn];
+      return {
+        label: prodName(x.pn), value: x.t.s, color: css("--accent"), text: compact(x.t.s),
+        tip: [{ label: "Subcategory", value: info ? info[1] : "?" }, { label: "Launched", value: info ? String(info[2]) : "?" }, { label: "Sales", value: compact(x.t.s) }, { label: "Units", value: int(x.t.q) }, { label: "ASP", value: (x.t.s / x.t.q).toFixed(1) }],
+      };
+    };
+    const top = g.slice(0, 3), bottom = g.slice(-3).reverse();
+    hbars(document.getElementById("top3"), top.map(item), { max: niceMax(Math.max(1, ...top.map((x) => x.t.s))), fmtAxis: compact, aria: "Top 3 products" });
+    hbars(document.getElementById("bottom3"), bottom.map(item), { max: niceMax(Math.max(1, ...bottom.map((x) => x.t.s))), fmtAxis: compact, aria: "Bottom 3 products" });
+    const listed = Object.keys(D.product_info).filter((pn) => subOk(subIdx[D.product_info[pn][1]])).length;
+    document.getElementById("zero-note").textContent = `${g.filter((x) => D.product_info[x.pn]).length} of ${listed} listed products sold in this selection. In Power BI a plain "Bottom 3" filter returns products with zero sales; add a "Sales > 0" filter.`;
+  }
+
+  function renderCohort() {
+    const yr = state.year, rs = prods(yr), tot = sum(rs).s;
+    const g = [...groupBy(rs, (r) => (D.product_info[r[2]] ? D.product_info[r[2]][2] : 0))]
+      .map(([ly, v]) => ({ ly, t: sum(v) })).filter((x) => x.t.s > 0).sort((a, b) => b.ly - a.ly);
+    const recent = g.filter((x) => x.ly >= yr - 1).reduce((s, x) => s + x.t.s, 0);
+    document.getElementById("cohort-title").textContent = `${pct(recent / tot, 0)} of ${yr} sales come from products launched in ${yr - 1} or ${yr}`;
+    const max = niceMax(Math.max(1, ...g.map((x) => x.t.s)));
+    hbars(document.getElementById("cohort"), g.map((x) => ({
+      label: x.ly ? "Launched " + x.ly : "Unknown", value: x.t.s, color: x.ly >= yr - 1 ? css("--accent") : css("--context"),
+      text: compact(x.t.s) + " · " + pct(x.t.s / tot, 0),
+      tip: [{ label: "Sales", value: compact(x.t.s) }, { label: "Share", value: pct(x.t.s / tot) }],
+    })), { max, labelW: 130, valW: 96, fmtAxis: compact, aria: "Sales by product launch year" });
+    table(document.getElementById("cohort-table"), ["Launch year", "Sales", "Share"], g.map((x) => [x.ly || "Unknown", int(x.t.s), pct(x.t.s / tot)]));
+  }
+
+  function renderCcy() {
+    const yr = state.year, host = document.getElementById("ccy");
+    if (!hasPrior()) {
+      document.getElementById("ccy-sub").textContent = "";
+      host.replaceChildren(); el("p", { class: "note", text: "Pick 2019 or 2020 to compare growth across currencies." }, host); return;
+    }
+    const ccys = Object.keys(D.rates).sort((a, b) => (a === "DKK" ? -1 : b === "DKK" ? 1 : a.localeCompare(b)));
+    const a = weekly(yr), b = weekly(yr - 1);
+    const body = ccys.map((c) => {
+      const s1 = sum(a, c).s, s0 = sum(b, c).s;
+      return [c, D.rates[c][String(yr - 1)].toFixed(2), D.rates[c][String(yr)].toFixed(2), int(s0), int(s1), spct(s1 / s0 - 1)];
+    });
+    document.getElementById("ccy-sub").textContent = `${yr} vs ${yr - 1} sales, same data converted into each currency`;
+    table(host, ["Currency", `Rate ${yr - 1}`, `Rate ${yr}`, `Sales ${yr - 1}`, `Sales ${yr}`, "YoY"], body, ccys.indexOf(state.ccy));
+  }
+
+  function renderTI() {
+    const yr = state.year;
+    const month = (y) => {
+      const v = Array(12).fill(0);
+      for (const r of weekly(y)) v[D.week_month[r[0] + "-" + r[1]] - 1] += conv(r[4], r[0]);
+      return v;
+    };
+    const cur = month(yr), ly = hasPrior() ? month(yr - 1) : null;
+    let ytd = 0, ytdLy = 0;
+    const body = MONTHS.map((mm, i) => {
+      ytd += cur[i]; if (ly) ytdLy += ly[i];
+      return [mm + " " + yr, int(cur[i]), int(ytd), ly ? int(ly[i]) : "–", ly ? int(ytdLy) : "–",
+        ly && ly[i] ? spct(cur[i] / ly[i] - 1) : "–", i && cur[i - 1] ? spct(cur[i] / cur[i - 1] - 1) : "–"];
+    });
+    document.getElementById("ti-sub").textContent = `${yr} by month in ${state.ccy}` + (ly ? ` · LY = same month in ${yr - 1}` : "");
+    table(document.getElementById("ti"), ["Month", "Sales", "Sales YTD", "Sales LY", "YTD LY", "YoY %", "MoM %"], body);
+  }
+
+  function renderAll() {
+    renderKpis(); renderTrend(); renderCountries(); renderYoy(); renderSubs(); renderBLs(); renderProducts(); renderCohort(); renderCcy(); renderTI();
+  }
+
+  function init(data) {
+    D = data;
+    blCountry = Object.fromEntries(D.business_lines.map((b) => [b.no, b.country]));
+    subIdx = Object.fromEntries(D.subcats.map((s, i) => [s, i]));
+    const fc = document.getElementById("f-ccy");
+    Object.keys(D.rates).sort((a, b) => (a === "DKK" ? -1 : b === "DKK" ? 1 : a.localeCompare(b))).forEach((c) => el("option", { value: c, text: c }, fc));
+    const fco = document.getElementById("f-country");
+    D.countries.forEach((c) => el("option", { value: c, text: c }, fco));
+    const fs = document.getElementById("f-sub");
+    D.subcats.forEach((s) => el("option", { value: s, text: s }, fs));
+    document.getElementById("f-year").addEventListener("change", (e) => { state.year = +e.target.value; renderAll(); });
+    fc.addEventListener("change", (e) => { state.ccy = e.target.value; renderAll(); });
+    fco.addEventListener("change", (e) => { state.country = e.target.value; renderAll(); });
+    fs.addEventListener("change", (e) => { state.sub = e.target.value; renderAll(); });
+    document.querySelectorAll("#f-weeks button").forEach((b) => b.addEventListener("click", () => {
+      state.weeks = b.dataset.v;
+      document.querySelectorAll("#f-weeks button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+      renderAll();
+    }));
+    renderAll();
+    let t;
+    window.addEventListener("resize", () => { clearTimeout(t); t = setTimeout(renderAll, 120); });
+    if (window.matchMedia) window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", renderAll);
+  }
+
+  fetch("data.json").then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(init)
+    .catch(() => { document.getElementById("err").style.display = "block"; });
+})();
+</script>
+</body>
+</html>

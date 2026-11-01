@@ -1,4 +1,6 @@
-# Power BI Case 3 — Sales Analysis: Step-by-Step Rebuild Guide
+# Power BI Case 3 — YourFashion Jewelry Sales Report
+
+**Live web version:** `https://jkazeyuki.github.io/DataProject/case3/` (see [Publish](#11-publish-the-link-for-your-resume))
 
 How to rebuild `PowerBI_Case_3_Final_solution - Sales Analysis.pbix` from the raw Excel files.
 I wrote this guide by taking the solution file apart: every query, DAX formula, relationship and
@@ -8,6 +10,96 @@ or a shortcut you should do better.
 **What you're building:** a 6-page sales report for the jewelry brand "YourFashion": cover,
 overview, time intelligence, sales details, product tooltip and contact. It covers weekly sales
 from 2018 to 2020 across 29 business lines in 6 countries, with every amount switchable into 7 currencies.
+
+| File | What it is |
+|---|---|
+| `README.md` (this file) | 3-day plan, explanation, step-by-step build, insights, publishing |
+| [`build_data.py`](build_data.py) | Rebuilds `docs/case3/data.json` for the web version from the 5 Excel files |
+| [`../docs/case3/index.html`](../docs/case3/index.html) | Interactive web dashboard (the resume link) |
+| `YourFashion_Sales.pbix` | *(you create this)* the Power BI report |
+| `screenshots/` | *(you create this)* one PNG per report page |
+
+The raw Excel files are course material and are **not** committed. Keep them locally.
+
+---
+
+## The 3-day plan
+
+About 4–5 focused hours per day. Each day ends with something committed to GitHub.
+
+### Day 1: Understand the data and build the model
+| Time | Task | Section |
+|---|---|---|
+| 30 min | Read **"Understand the case"** below. Open each Excel file and find the columns it mentions | [Understand](#understand-the-case-in-10-minutes) |
+| 15 min | Power BI Desktop: turn off Auto date/time, create the `FolderPath` parameter | §0–1 |
+| 1.5 h | Power Query: load and clean all 5 files (paste the M code, then *read* every step and be able to explain it) | §2 |
+| 45 min | Calculated columns and calculated tables (`DimDate`, `DimCurrency`), mark the date table | §3–4 |
+| 30 min | Six relationships; compare the Model view with the diagram | §5 |
+| 15 min | Save as `powerbi_case3/YourFashion_Sales.pbix`, commit | |
+
+**Done when:** a table visual with `DimDate[Year]` and `SUM(Sales Amount DKK)` shows 2,487,740,053 / 2,482,279,917 / 2,714,641,749.
+
+### Day 2: Measures and report pages
+| Time | Task | Section |
+|---|---|---|
+| 1 h | All DAX measures. Build `TotalSales` first, test it on a card with the Year and Currency slicers | §6 |
+| 30 min | Theme, sidebar, slicers, *Sync slicers* | §7.1–7.2 |
+| 1 h | OVERVIEW page | §7.4 |
+| 1 h | TIME INTEL page with the country bookmarks | §7.5 |
+| 1 h | SALES DETAILS page, product tooltip page, cover, contact | §7.3, 7.6–7.8 |
+
+**Done when:** every number in [§8 Check your numbers](#8-check-your-numbers) matches.
+
+### Day 3: Insights, polish and publish
+| Time | Task | Section |
+|---|---|---|
+| 1 h | Read **What the data says**. Find each finding in your own report, and add an insights text box to OVERVIEW | §10 |
+| 1 h | Polish: findings as titles, alignment, consistent fonts, hide helper pages | §7 |
+| 30 min | Screenshots of each page into `powerbi_case3/screenshots/`, plus a 30-second GIF of the currency slicer | §11 |
+| 30 min | Merge to `main`, turn on GitHub Pages, check the live link on your phone | §11 |
+| 30 min | Add the resume bullet and practise the 2-minute walkthrough out loud | §11–12 |
+
+---
+
+## Understand the case in 10 minutes
+
+**The business.** YourFashion sells jewelry (charms, bracelets, dangles, necklaces) through
+**business lines**: shops or sales channels, 29 of them in 6 countries. Head office is in
+Denmark, so every sale is recorded in **Danish kroner (DKK)**. Management in each country wants
+to see the numbers in **their own currency**, and wants to know how sales are developing over time.
+
+**The data, one sentence per file:**
+- **`SalesOverview.xlsx`**: one row per *week × business line × product* with units and DKK amount.
+  This is the **fact table**: things that happened, which you add up.
+- **`Product.xlsx`**: what each product number is (subcategory, launch date, list price).
+  This is a **dimension**: descriptions you filter and group by.
+- **`BusinessLine.xlsx`**: which country each business line is in. Also a dimension.
+- **`Calendar.xlsx`**: which month each ISO week belongs to. Sales only have a week number
+  (`13.2020`), and this file turns it into a month so you can build monthly charts.
+- **`ExchangeRate.xlsx`**: how many DKK 100 units of each currency cost, per year.
+
+**The three ideas the case tests:**
+1. **Star schema.** One fact table in the middle, dimensions around it, each linked by a key
+   (product number, business line number, week). Filters flow from dimensions to the fact:
+   pick "China" in `DimBusinessLine` and only China's sales rows are added up.
+2. **Currency conversion in DAX.** No currency column exists in the sales data. The `TotalSales`
+   measure computes it on the fly: *find the selected currency, find the year, look up that year's
+   rate, divide*. 100 EUR = 745 DKK, so 1,000 DKK = 1,000 ÷ 7.45 = 134 EUR. The same sales show
+   different growth in different currencies (+9.4% in DKK, +8.4% in SEK, +11.6% in USD), because the
+   exchange rates changed between years.
+3. **Time intelligence.** "Same period last year", "year to date" and "growth %" are measures that
+   shift the date filter (`DATEADD`, `DATESYTD`). They only work with a proper date table
+   (`DimDate`) that is **marked as a date table**.
+
+**Words you'll be asked about:**
+
+| Term | Meaning here |
+|---|---|
+| ASP | Average selling price = sales ÷ units |
+| YoY % / MoM % | Growth vs same month last year / vs previous month |
+| YTD | Year to date: total from 1 January up to the current month |
+| ISO week | Weeks run Monday–Sunday. Week 1 is the week with the year's first Thursday, so some years have **53** weeks (2020 does) |
+| 4-4-5 calendar | Each quarter = a 4-week, 4-week and 5-week "month". That's how `Calendar.xlsx` maps weeks to months |
 
 ---
 
@@ -66,16 +158,19 @@ let
     Source = Excel.Workbook(File.Contents(FolderPath & "\Product.xlsx"), null, true),
     Sheet1_Sheet = Source{[Item="Sheet1",Kind="Sheet"]}[Data],
     #"Promoted Headers" = Table.PromoteHeaders(Sheet1_Sheet, [PromoteAllScalars=true]),
-    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Product No", Int64.Type}, {"Product Name", type text}, {"Category", type text}, {"SubCategory", type text}, {"Launch Date", type date}, {"List Price DKK", type text}}),
-    #"Replaced Value" = Table.ReplaceValue(#"Changed Type","#","0",Replacer.ReplaceText,{"List Price DKK"}),
-    #"Changed Type1" = Table.TransformColumnTypes(#"Replaced Value",{{"List Price DKK", type number}}, "en-US")
+    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Product No", Int64.Type}, {"Product Name", type text}, {"Category", type text}, {"SubCategory", type text}}),
+    #"Parsed Launch Date" = Table.TransformColumns(#"Changed Type", {{"Launch Date", each Date.FromText(_, [Format="dd.MM.yyyy"]), type date}}),
+    #"Replaced Hash" = Table.ReplaceValue(#"Parsed Launch Date", "#", 0, Replacer.ReplaceValue, {"List Price DKK"}),
+    #"Changed Type1" = Table.TransformColumnTypes(#"Replaced Hash",{{"List Price DKK", type number}})
 in
     #"Changed Type1"
 ```
-> ⚠️ **Locale trap.** The solution's author uses a Danish locale, where `,` is the decimal separator, so their query
-> also replaces `.` with `,` before converting to a number. On an English or Chinese locale that step
-> turns `67.5` into `675`, ten times too big, or into errors. Leave it out. The `"en-US"` argument above
-> parses `67.5` correctly on any machine. Some prices are `#` in the source, and those become 0.
+> ⚠️ **Two locale traps** (the solution's author works on a Danish PC):
+> - **Launch Date** is text like `01.06.2020`, meaning 1 June. A plain *type date* on an English PC reads it
+>   as **6 January** or fails. `Date.FromText` with an explicit `dd.MM.yyyy` format reads it correctly everywhere.
+> - **List Price DKK** holds numbers plus 10 cells containing `#`. The solution converts the column to text
+>   and swaps `.` for `,`, which only works on a Danish PC; on yours it turns 67.5 into 675.
+>   Replacing the `#` *value* with 0 and then setting *type number* never goes through text.
 
 ### 2.3 `DimCalendar_x`
 ```m
@@ -111,11 +206,12 @@ let
     Source = Excel.Workbook(File.Contents(FolderPath & "\SalesOverview.xlsx"), null, true),
     Sheet1_Sheet = Source{[Item="Sheet1",Kind="Sheet"]}[Data],
     #"Promoted Headers" = Table.PromoteHeaders(Sheet1_Sheet, [PromoteAllScalars=true]),
-    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Year Week Number", type text}, {"Business Line no.", type text}, {"Product No", type text}, {"Sales Qty", Int64.Type}, {"Sales Amount DKK", type number}}),
+    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Year Week Number", type text}, {"Business Line no.", type text}, {"Product No", type text}, {"Sales Qty", type number}, {"Sales Amount DKK", type number}}),
     #"Removed Bad Keys" = Table.SelectRows(#"Changed Type", each
         [Product No] <> null and [Product No] <> "#N/A" and [Product No] <> "'"
         and [#"Business Line no."] <> "#"),
-    #"Key Types" = Table.TransformColumnTypes(#"Removed Bad Keys",{{"Product No", Int64.Type}, {"Business Line no.", Int64.Type}})
+    #"Removed Empty Rows" = Table.SelectRows(#"Removed Bad Keys", each [Sales Qty] <> 0 or [Sales Amount DKK] <> 0),
+    #"Key Types" = Table.TransformColumnTypes(#"Removed Empty Rows",{{"Product No", Int64.Type}, {"Business Line no.", Int64.Type}})
 in
     #"Key Types"
 ```
@@ -125,6 +221,13 @@ in
 > out of 7.7bn, but in an interview "I found and removed 5.5k rows with invalid keys" is a good line.
 > Converting the keys to **whole numbers** gives them the same type as the dimension keys, which
 > relationships need.
+>
+> **Units are decimals.** `Sales Qty` contains values like 6.14, probably because the course data was
+> anonymised by scaling. Power BI auto-detects the column as *Whole number* and silently rounds every row.
+> Set it to **Decimal number** (`type number`).
+>
+> **Empty rows.** 229,537 rows (42%) have 0 units *and* 0 sales: every product is listed for every week,
+> sold or not. Removing them makes the model smaller and changes no total.
 >
 > `Year Week Number` looks like `13.2020` (zero-padded week + `.` + year). Keep it as **text**.
 
@@ -441,33 +544,92 @@ must match. Then **hide** the page.
 
 ## 8. Check your numbers
 
-These are computed from the solution's data. DKK totals include the ~234k DKK of junk-key rows; if you
-removed them as in step 2.5, your totals are about 0.01% lower.
+Computed from the raw Excel files with the cleaning in §2. The solution `.pbix` shows slightly
+different figures (2020 = 2,714,722,926 DKK, 15,978,069 units) because it kept the junk-key rows and
+rounded the units.
 
 | Year | TotalSales DKK | TotalSales SEK | TotalSales Qty | ASP (DKK) |
 |---|---|---|---|---|
-| 2018 | 2,487,871,167 | 3,422,280,319 | 14,166,714 | 175.61 |
-| 2019 | 2,482,301,254 | 3,519,941,200 | 15,412,246 | 161.06 |
-| 2020 | 2,714,722,926 | 3,817,118,078 | 15,978,069 | 169.90 |
+| 2018 | 2,487,740,053 | 3,422,099,960 | 14,160,780 | 175.68 |
+| 2019 | 2,482,279,917 | 3,519,910,944 | 15,407,050 | 161.11 |
+| 2020 | 2,714,641,749 | 3,817,003,937 | 15,971,868 | 169.96 |
 
-- **Sales YoY% 2020:** +9.36% in DKK, but **+8.44% in SEK**, because last year is converted at last
-  year's rate. Seeing YoY change with the currency is how you know the measure works.
+- **Sales YoY% 2020:** +9.36% in DKK, but **+8.44% in SEK** and +11.6% in USD, because last year is
+  converted at last year's rate. Seeing YoY change with the currency is how you know the measure works.
 - **2020 by SubCategory (DKK):** Charms 1.82bn › Bracelet 559M › Dangle 221M › Necklace 118M.
 - **2020 by Country (DKK):** Australia 846M › China 835M › Spain 437M › USA 338M › Germany 130M › Italy 128M.
 - **Top 3 products 2020:** P 84 (207M DKK), P 186 (127M), P 94 (113M).
 - **Top business line by qty 2020:** BL 1 (China), 4.25M units, nearly 3× the next (BL 25, 1.46M).
 
+The [web version](../docs/case3/index.html) shows all of these, so you can compare any filter combination.
+
 ---
 
-## 9. Turning it into a portfolio piece
+## 9. Data audit (what to say you found)
 
-1. Add a short **insights text box** on OVERVIEW. Reading off the numbers above:
-   - Charms drive about two-thirds of 2020 sales.
-   - Australia and China together make up 62%.
-   - BL 1 alone sells about 27% of all units.
-2. Save screenshots of each page and record a 30-second GIF clicking the currency slicer and the
-   country bookmarks.
-3. Resume line:
-   > Built a multi-currency Power BI sales report (540k weekly rows, 29 business lines, 6 countries):
-   > star-schema model, Power Query cleaning of invalid keys, DAX currency conversion via yearly
-   > exchange-rate lookup, YTD / YoY / MoM time intelligence, bookmarks, drill tooltips.
+| Issue | Impact | Fix |
+|---|---|---|
+| 5,480 sales rows with junk keys (`#` business line, `'` product) | Rows can't join to dimensions; the solution's filter had a typo and kept them | Filter them out in Power Query |
+| `Sales Qty` has decimals (6.14 units) | Auto-detected *Whole number* rounds every row | Set the type to Decimal |
+| 229,537 rows (42%) are 0 units and 0 sales | Bigger model, no information | Remove |
+| Launch dates are `dd.mm.yyyy` text; list prices contain `#` | Wrong dates / wrong prices on non-Danish PCs | `Date.FromText` with a format; replace `#` with 0 |
+| Product 99 sells (198K DKK) but isn't in `Product.xlsx` | Shows as (Blank) | Report it to the data owner |
+| A few products launched in 2021 already have 2020 sales (6.9M DKK) | Pre-launch sales or wrong launch dates | Flag it |
+| 2020 has 53 ISO weeks, and the 4-4-5 calendar moves week 48 into November | YoY and monthly comparisons are distorted | Compare 52 weeks and Nov+Dec together |
+| `ExchangeRate.xlsx` has a second sheet ("Info") with mismatched codes, and GBP is spelled `BGP` | Easy to load the wrong sheet | Load only the "Exchange Rate" sheet |
+
+---
+
+## 10. What the data says (the story)
+
+1. **2020 grew +9.4%, but a third of that is an extra week.** 2020 has 53 ISO weeks and week 53 alone is
+   71M DKK. On 52 comparable weeks growth is **+6.5%**. Units grew only +1.1% on 52 weeks, so growth
+   came from a **higher average price** (161 → 170 DKK), not from selling more pieces.
+2. **The peak moved earlier.** Q4 (weeks 40+) is 48% of the year. In 2020 weeks 44–48 (up to Black Friday
+   week) were **+25%** vs 2019 and weeks 49–52 **−19%**. A monthly chart shows "Nov +85%, Dec −25%",
+   which is mostly the calendar moving week 48 into November.
+3. **Charms are the business, but growth came from elsewhere.** Charms are 67% of sales and were flat
+   (−0.3%). Bracelets (+41%) and Dangles (+47%) drove growth. Dangles and Necklaces are new lines (almost no 2018 sales).
+4. **Fast product turnover.** 62% of 2020 sales come from products launched in 2020 and 33% from 2019
+   launches. 31 of 272 selling products make 80% of sales.
+5. **Concentration.** Australia and China are 31% each. BL 1 in China sells 27% of all units. The USA (+16%)
+   and Spain (+12%) grew fastest; Australia slowest (+7%).
+
+**Recommendation:** report growth on comparable weeks and a fixed currency, plan stock and marketing for a
+Black-Friday-led peak, keep the launch pipeline strong, and reduce dependence on BL 1 by growing the USA and Spain.
+
+---
+
+## 11. Publish the link for your resume
+
+Power BI *Publish to web* needs a work or school account, so the public link is the **GitHub Pages**
+web version in `docs/case3/`. It recomputes the same measures in the browser, as Case 2 does.
+
+1. Merge this branch into `main` (open a PR on GitHub and merge it).
+2. Repo **Settings → Pages → Build and deployment → Deploy from a branch → `main` / `/docs`** → Save.
+   On a free account the repo must be **public**.
+3. After about a minute: `https://jkazeyuki.github.io/DataProject/case3/`
+4. Put the Power BI screenshots in `powerbi_case3/screenshots/` and link them at the top of this README,
+   so reviewers see the real report too. Commit the `.pbix` as well.
+
+To rebuild the web data: `python powerbi_case3/build_data.py "<folder with the 5 Excel files>"`
+
+**Resume bullet:**
+> **Multi-currency Sales Report, YourFashion** (Power BI, Power Query, DAX) [live link]
+> Cleaned 540k weekly sales rows (invalid keys, rounding, locale-dependent dates) into a star-schema
+> model; built DAX currency conversion across 7 currencies and YTD/YoY/MoM time intelligence; showed
+> that a third of 2020's +9.4% growth came from a 53rd ISO week (like-for-like +6.5%).
+
+---
+
+## 12. Your 2-minute interview walkthrough
+
+1. **Problem** (15 s): "A Danish jewelry brand sells in 6 countries. Managers want sales in their own
+   currency and want to know how sales are developing."
+2. **Data and cleaning** (30 s): "Five Excel files. I found junk keys, units being rounded, dates that only
+   parse on a Danish PC, and 42% empty rows, and fixed them in Power Query."
+3. **Model and DAX** (30 s): "Star schema. Sales are stored in DKK; one measure looks up the selected
+   currency's rate for each year and converts. Time intelligence runs on a marked date table."
+4. **Insight** (30 s): "Reported growth was 9.4%, but 2020 had 53 weeks. Like-for-like it's 6.5%, and it
+   came from price and mix, not volume."
+5. **Result** (15 s): "Interactive report plus a public web version." Then open the link.
