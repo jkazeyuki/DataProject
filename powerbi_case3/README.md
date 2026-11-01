@@ -14,6 +14,7 @@ from 2018 to 2020 across 29 business lines in 6 countries, with every amount swi
 | File | What it is |
 |---|---|
 | `README.md` (this file) | 3-day plan, explanation, step-by-step build, insights, publishing |
+| [`DAY_BY_DAY.md`](DAY_BY_DAY.md) | Click-by-click walkthrough for each day, with checkpoints and troubleshooting |
 | [`build_data.py`](build_data.py) | Rebuilds `docs/case3/data.json` for the web version from the 5 Excel files |
 | [`../docs/case3/index.html`](../docs/case3/index.html) | Interactive web dashboard (the resume link) |
 | `YourFashion_Sales.pbix` | *(you create this)* the Power BI report |
@@ -26,6 +27,7 @@ The raw Excel files are course material and are **not** committed. Keep them loc
 ## The 3-day plan
 
 About 4–5 focused hours per day. Each day ends with something committed to GitHub.
+**Click-by-click instructions for every step: [`DAY_BY_DAY.md`](DAY_BY_DAY.md).**
 
 ### Day 1: Understand the data and build the model
 | Time | Task | Section |
