@@ -1,0 +1,629 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nordic Flip-flop Sales</title>
+<meta name="description" content="Global sales performance dashboard for Nordic Flip-flop (2016–2017): markets, products, pricing and time intelligence. Built in Power BI, mirrored on the web.">
+<style>
+:root {
+  color-scheme: light;
+  --page: #f9f9f7;
+  --surface: #fcfcfb;
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --muted: #898781;
+  --grid: #e1e0d9;
+  --axis: #c3c2b7;
+  --border: rgba(11,11,11,0.10);
+  --accent: #2a78d6;
+  --context: #c3c2b7;
+  --pos: #2a78d6;
+  --neg: #e34948;
+  --cat-1: #2a78d6;
+  --cat-2: #eb6834;
+  --cat-3: #1baf7a;
+  --good-text: #006300;
+  --bad-text: #b42323;
+  --chip: #eeede8;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0d0d0d;
+    --surface: #1a1a19;
+    --ink: #f0efec;
+    --ink-2: #c3c2b7;
+    --muted: #898781;
+    --grid: #2c2c2a;
+    --axis: #383835;
+    --border: rgba(255,255,255,0.10);
+    --accent: #3987e5;
+    --context: #5a5955;
+    --pos: #3987e5;
+    --neg: #e66767;
+    --cat-1: #3987e5;
+    --cat-2: #d95926;
+    --cat-3: #199e70;
+    --good-text: #0ca30c;
+    --bad-text: #e66767;
+    --chip: #2c2c2a;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d;
+  --surface: #1a1a19;
+  --ink: #f0efec;
+  --ink-2: #c3c2b7;
+  --muted: #898781;
+  --grid: #2c2c2a;
+  --axis: #383835;
+  --border: rgba(255,255,255,0.10);
+  --accent: #3987e5;
+  --context: #5a5955;
+  --pos: #3987e5;
+  --neg: #e66767;
+  --cat-1: #3987e5;
+  --cat-2: #d95926;
+  --cat-3: #199e70;
+  --good-text: #0ca30c;
+  --bad-text: #e66767;
+  --chip: #2c2c2a;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--page);
+  color: var(--ink);
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+a { color: var(--accent); }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 32px 16px 64px; }
+header h1 { font-size: 28px; line-height: 1.2; margin: 0 0 6px; font-weight: 650; letter-spacing: -0.01em; }
+header p { margin: 0; color: var(--ink-2); max-width: 760px; }
+.byline { font-size: 13px; color: var(--muted); margin-top: 8px !important; }
+.filters { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: end; margin: 28px 0 16px; }
+.filters label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--ink-2); }
+select, .seg button {
+  font: inherit; font-size: 14px; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  padding: 6px 10px; min-height: 34px;
+}
+.seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; cursor: pointer; background: var(--surface); color: var(--ink-2); }
+.seg button[aria-pressed="true"] { background: var(--chip); color: var(--ink); font-weight: 600; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 12px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; min-width: 0; }
+.kpi .label { font-size: 13px; color: var(--ink-2); }
+.kpi .value { font-size: 30px; font-weight: 600; line-height: 1.2; margin-top: 4px; }
+.kpi .delta { font-size: 13px; margin-top: 4px; color: var(--ink-2); }
+.kpi .delta b { font-weight: 600; }
+.up { color: var(--good-text); }
+.down { color: var(--bad-text); }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.span-2 { grid-column: 1 / -1; }
+@media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } .span-2 { grid-column: auto; } }
+.card h2 { font-size: 15px; font-weight: 600; margin: 0; }
+.card .sub { font-size: 13px; color: var(--ink-2); margin: 2px 0 10px; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12px; color: var(--ink-2); margin-bottom: 6px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.key-line { width: 16px; height: 2px; border-radius: 1px; display: inline-block; }
+.key-rect { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.chart { width: 100%; position: relative; }
+.chart svg { display: block; width: 100%; overflow: visible; }
+.chart text { font-size: 11px; fill: var(--muted); font-variant-numeric: tabular-nums; }
+.chart text.lbl { fill: var(--ink-2); }
+.chart text.val { fill: var(--ink); }
+.note { font-size: 12px; color: var(--muted); margin: 8px 0 0; }
+details { margin-top: 8px; font-size: 13px; }
+summary { cursor: pointer; color: var(--ink-2); }
+table { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+th, td { padding: 6px 8px; border-bottom: 1px solid var(--grid); text-align: right; white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { color: var(--ink-2); font-weight: 600; }
+.table-scroll { overflow-x: auto; }
+#tip {
+  position: fixed; pointer-events: none; z-index: 10; display: none;
+  background: var(--surface); color: var(--ink); border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 10px; font-size: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  min-width: 140px;
+}
+#tip .t { color: var(--ink-2); margin-bottom: 4px; }
+#tip .row { display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+#tip .row b { font-weight: 600; font-variant-numeric: tabular-nums; }
+#tip .row span { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); }
+.hit { fill: transparent; cursor: default; }
+.bar:hover, .bar:focus { opacity: 0.8; outline: none; }
+section.story { margin-top: 40px; }
+section.story h2 { font-size: 20px; margin: 0 0 12px; }
+.findings { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+.findings .card h3 { font-size: 15px; margin: 0 0 6px; }
+.findings .card p { margin: 0; color: var(--ink-2); font-size: 14px; }
+.method { columns: 2 320px; column-gap: 32px; color: var(--ink-2); font-size: 14px; }
+.method h3 { color: var(--ink); font-size: 15px; margin: 0 0 4px; break-after: avoid; }
+.method p, .method ul { margin: 0 0 16px; break-inside: avoid; }
+.method ul { padding-left: 18px; }
+code { font-size: 12.5px; background: var(--chip); padding: 1px 5px; border-radius: 4px; }
+footer { margin-top: 40px; font-size: 13px; color: var(--muted); }
+#err { display: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Nordic Flip-flop — Global Sales Performance</h1>
+    <p>Management report on 7 live markets, 8 products and 19,748 orders (Jan 2016 – Dec 2017). Built in Power BI (Power Query, star schema, DAX time intelligence); this page mirrors the report so it can be opened from any browser.</p>
+    <p class="byline">Case study · Power BI / DAX · <a href="https://github.com/jkazeyuki/DataProject/tree/main/powerbi_case2">Source, DAX and build notes on GitHub</a></p>
+  </header>
+
+  <div class="card" id="err" role="alert">Could not load <code>data.json</code>. Open this page through a web server (GitHub Pages or <code>python -m http.server</code>), not as a local file.</div>
+
+  <div class="filters" role="group" aria-label="Filters">
+    <label>Year
+      <select id="f-year">
+        <option value="all">2016–2017</option>
+        <option value="2017">2017</option>
+        <option value="2016">2016</option>
+      </select>
+    </label>
+    <label>Continent
+      <select id="f-continent"><option value="all">All continents</option></select>
+    </label>
+    <label>Category
+      <select id="f-category"><option value="all">All categories</option></select>
+    </label>
+    <label>Date basis
+      <span class="seg" id="f-basis">
+        <button type="button" data-v="order" aria-pressed="true">Order date</button>
+        <button type="button" data-v="payment" aria-pressed="false">Payment date</button>
+      </span>
+    </label>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="grid">
+    <div class="card span-2">
+      <h2 id="trend-title">Monthly sales, 2017 vs 2016</h2>
+      <p class="sub" id="trend-sub"></p>
+      <div class="legend" id="trend-legend"></div>
+      <div class="chart" id="trend"></div>
+      <p class="note">Data ends 17 Dec 2017 (San Francisco ends 16 Nov, Vancouver 14 Oct), so Nov–Dec 2017 are incomplete.</p>
+      <details><summary>Show table</summary><div class="table-scroll" id="trend-table"></div></details>
+    </div>
+
+    <div class="card">
+      <h2>Three cities make 71% of sales</h2>
+      <p class="sub">Sales by city · share of total</p>
+      <div class="chart" id="cities"></div>
+      <p class="note">Copenhagen, Montreal and Hanoi are in the geography table but have no sales yet.</p>
+      <details><summary>Show table</summary><div class="table-scroll" id="cities-table"></div></details>
+    </div>
+
+    <div class="card">
+      <h2>Like-for-like growth: Jan–Sep 2017 vs Jan–Sep 2016</h2>
+      <p class="sub">Year-over-year % by city (same months both years)</p>
+      <div class="legend"><span><i class="key-rect" style="background:var(--pos)"></i>Growth</span><span><i class="key-rect" style="background:var(--neg)"></i>Decline</span></div>
+      <div class="chart" id="yoy"></div>
+      <p class="note">* London (from 23 Feb 2016) and Vancouver (from 26 Apr 2016) have a partial 2016 base, so their growth is overstated.</p>
+      <details><summary>Show table</summary><div class="table-scroll" id="yoy-table"></div></details>
+    </div>
+
+    <div class="card">
+      <h2>Two pricing models: Europe discounts, Asia &amp; US sell above list</h2>
+      <p class="sub">Average selling price ÷ list price, by city (line = list price)</p>
+      <div class="chart" id="price"></div>
+      <details><summary>Show table</summary><div class="table-scroll" id="price-table"></div></details>
+    </div>
+
+    <div class="card">
+      <h2>Sales are spread evenly across the 8 products</h2>
+      <p class="sub">Sales by product, coloured by category</p>
+      <div class="legend" id="prod-legend"></div>
+      <div class="chart" id="products"></div>
+      <details><summary>Show table</summary><div class="table-scroll" id="products-table"></div></details>
+    </div>
+
+    <div class="card span-2">
+      <h2>Time intelligence</h2>
+      <p class="sub" id="ti-sub"></p>
+      <div class="table-scroll" id="ti"></div>
+      <p class="note">MTD = month to date (here: the month total); YTD = year to date; SPLY = same period last year. In Power BI these are DAX measures (<code>TOTALMTD</code>, <code>TOTALYTD</code>, <code>SAMEPERIODLASTYEAR</code>).</p>
+    </div>
+  </div>
+
+  <section class="story">
+    <h2>What the data says</h2>
+    <div class="findings">
+      <div class="card"><h3>1 · 2017 is not down — the data is incomplete</h3><p>Reported 2017 sales (505.4M) look 3.2% below 2016 (522.1M), but 2017 data stops in mid-December and two markets stop earlier. Comparing the same months (Jan–Sep), sales grew <b>+8.6%</b>; the five markets with a full 2016 base grew +3.7%.</p></div>
+      <div class="card"><h3>2 · Revenue is concentrated in Singapore, San Francisco and New York</h3><p>Singapore alone is 32% of sales, and the top three cities are 71%. Vancouver (+109%) and London (+38%) grow fastest but from a partial 2016 base. Paris (−14%) is the only established market that declined.</p></div>
+      <div class="card"><h3>3 · Europe sells volume, the rest sells price</h3><p>Rome and Paris ship 65% of all units but bring 20% of sales: their average price is 70–75% below list. Singapore's average price is 3.4× list. Before comparing markets, management should confirm whether sales amounts are in one currency.</p></div>
+      <div class="card"><h3>4 · No single hero product</h3><p>Each of the 8 products is 11–14% of sales. Alcohol leads by category (40%) because it has three products. Whisky, the most expensive item (list 4,000), carries the deepest average discount (42%).</p></div>
+      <div class="card"><h3>5 · Booked sales and cash differ by a 12-day lag</h3><p>Customers pay a median of 12 days after ordering. December 2016 was the strongest month by order date (58.6M, driven by Singapore at 2.1× its usual month), and 6.2M of 2017 orders are paid in 2018 — so finance (payment date) and sales (order date) reports will not match.</p></div>
+      <div class="card"><h3>Recommendation</h3><p>Report growth like-for-like, protect the three core cities, investigate Paris, and standardise currency and pricing rules across markets before setting discount targets. Next market launches: Copenhagen, Montreal, Hanoi are already set up in master data.</p></div>
+    </div>
+  </section>
+
+  <section class="story">
+    <h2>How it was built</h2>
+    <div class="method">
+      <h3>1. Power Query (ETL)</h3>
+      <ul>
+        <li>Combined the 7 market files from the <code>Facts</code> folder in one query (Folder connector).</li>
+        <li>Derived the city key from the file name (<code>NY_Results.xlsx</code> → <code>NY</code>).</li>
+        <li>Removed 366 blank rows (London) and excluded a duplicate Singapore file in <code>Other</code>.</li>
+      </ul>
+      <h3>2. Star schema</h3>
+      <p>One fact table (<code>FactSales</code>) with dimensions <code>DimProducts</code>, <code>DimGeo</code> and <code>DimCalendar</code>. The calendar has an active relationship on Order Date and an inactive one on Payment Date (role-playing dimension).</p>
+      <h3>3. DAX measures</h3>
+      <ul>
+        <li>Total Sales, Total Units, <b>ASP</b> = Sales ÷ Units</li>
+        <li><b>Discount %</b> = 1 − Sales ÷ Σ(Quantity × List Price)</li>
+        <li><b>MTD / YTD / SPLY</b> with <code>TOTALMTD</code>, <code>TOTALYTD</code>, <code>SAMEPERIODLASTYEAR</code></li>
+        <li><b>Sales by Order / Payment Date</b> with <code>USERELATIONSHIP</code></li>
+        <li>A dynamic measure (<code>SWITCH</code>) driven by a disconnected indicator table</li>
+      </ul>
+      <h3>4. Report</h3>
+      <p>Navigation page, sales dashboard with bookmarks and a report-page tooltip, discount page, time-intelligence page. This web version recomputes the same measures in the browser from an aggregated extract (<code>data.json</code>).</p>
+    </div>
+  </section>
+
+  <footer>Data: "World Class Power BI Case 2" training dataset (Nordic Flip-flop, fictional). Currency not specified in the source.</footer>
+</div>
+<div id="tip" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  "use strict";
+  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const PARTIAL_BASE = { Lon: true, Vanc: true };
+  const state = { year: "all", continent: "all", category: "all", basis: "order" };
+  let D, cityById, prodById, catColor;
+
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const el = (tag, attrs, parent) => {
+    const ns = ["svg","g","path","line","rect","text","circle"].includes(tag) ? "http://www.w3.org/2000/svg" : null;
+    const n = ns ? document.createElementNS(ns, tag) : document.createElement(tag);
+    for (const k in attrs || {}) {
+      if (k === "text") n.textContent = attrs[k];
+      else n.setAttribute(k, attrs[k]);
+    }
+    if (parent) parent.appendChild(n);
+    return n;
+  };
+  const compact = (v) => {
+    const a = Math.abs(v);
+    if (a >= 1e9) return (v / 1e9).toFixed(2) + "B";
+    if (a >= 1e6) return (v / 1e6).toFixed(a >= 1e8 ? 0 : 1) + "M";
+    if (a >= 1e3) return (v / 1e3).toFixed(a >= 1e5 ? 0 : 1) + "K";
+    return Math.round(v).toLocaleString("en-US");
+  };
+  const int = (v) => Math.round(v).toLocaleString("en-US");
+  const pct = (v, d = 1) => (v * 100).toFixed(d) + "%";
+  const spct = (v, d = 1) => (v >= 0 ? "+" : "−") + Math.abs(v * 100).toFixed(d) + "%";
+  const niceMax = (v) => {
+    if (v <= 0) return 1;
+    const p = Math.pow(10, Math.floor(Math.log10(v)));
+    for (const m of [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]) if (m * p >= v) return m * p;
+    return 10 * p;
+  };
+
+  // ---------- tooltip ----------
+  const tip = document.getElementById("tip");
+  function showTip(evt, title, rows) {
+    tip.replaceChildren();
+    el("div", { class: "t", text: title }, tip);
+    for (const r of rows) {
+      const row = el("div", { class: "row" }, tip);
+      const s = el("span", {}, row);
+      if (r.color) el("i", { class: "key-line", style: "background:" + r.color }, s);
+      s.appendChild(document.createTextNode(r.label));
+      el("b", { text: r.value }, row);
+    }
+    tip.style.display = "block";
+    let x, y;
+    if (evt.clientX !== undefined && evt.type !== "focus") { x = evt.clientX; y = evt.clientY; }
+    else { const b = evt.target.getBoundingClientRect(); x = b.left + b.width / 2; y = b.top; }
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    x = Math.min(x + 14, window.innerWidth - w - 8);
+    y = Math.max(8, Math.min(y - h - 10, window.innerHeight - h - 8));
+    tip.style.left = x + "px"; tip.style.top = y + "px";
+  }
+  const hideTip = () => { tip.style.display = "none"; };
+
+  // ---------- data helpers ----------
+  function rows(opts) {
+    const src = state.basis === "payment" && !(opts && opts.forceOrder) ? D.by_payment_date : D.by_order_date;
+    return src.filter((r) => {
+      if (!(opts && opts.ignoreYear) && state.year !== "all" && r[0] !== +state.year) return false;
+      if (r[0] < 2016 || r[0] > 2017) return false;
+      if (state.continent !== "all" && cityById[r[2]].continent !== state.continent) return false;
+      if (state.category !== "all" && prodById[r[3]].category !== state.category) return false;
+      return true;
+    });
+  }
+  function sum(rs) {
+    const t = { s: 0, q: 0, l: 0 };
+    for (const r of rs) { t.s += r[4]; t.q += r[5]; t.l += r[6]; }
+    return t;
+  }
+  function groupBy(rs, keyFn) {
+    const m = new Map();
+    for (const r of rs) {
+      const k = keyFn(r);
+      if (!m.has(k)) m.set(k, []);
+      m.get(k).push(r);
+    }
+    return m;
+  }
+
+  // ---------- table helper ----------
+  function table(host, head, body) {
+    host.replaceChildren();
+    const t = el("table", {}, host);
+    const tr = el("tr", {}, el("thead", {}, t));
+    head.forEach((h) => el("th", { text: h, scope: "col" }, tr));
+    const tb = el("tbody", {}, t);
+    body.forEach((r) => { const row = el("tr", {}, tb); r.forEach((c) => el("td", { text: c }, row)); });
+  }
+
+  // ---------- horizontal bar chart ----------
+  // items: [{label, value, text, color, tip:[{label,value}]}]; opts: {min, max, ref, refLabel, fmtAxis}
+  function hbars(host, items, opts) {
+    host.replaceChildren();
+    const W = host.clientWidth || 500;
+    const labelW = Math.min(118, W * 0.3), valW = 64, rowH = 30, barH = 18;
+    const top = 6, axisH = 22, H = top + items.length * rowH + axisH;
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, height: H, role: "img", "aria-label": opts.aria }, host);
+    const min = opts.min !== undefined ? opts.min : 0;
+    const max = opts.max;
+    const x0 = labelW + 8, x1 = W - valW;
+    const sx = (v) => x0 + ((v - min) / (max - min)) * (x1 - x0);
+    // grid + axis ticks
+    const ticks = opts.ticks || [0, max / 2, max];
+    ticks.forEach((t) => {
+      el("line", { x1: sx(t), x2: sx(t), y1: top, y2: H - axisH, stroke: css("--grid"), "stroke-width": 1 }, svg);
+      el("text", { x: sx(t), y: H - 6, "text-anchor": "middle", text: opts.fmtAxis(t) }, svg);
+    });
+    const base = sx(Math.max(min, 0));
+    el("line", { x1: base, x2: base, y1: top, y2: H - axisH, stroke: css("--axis"), "stroke-width": 1 }, svg);
+    items.forEach((it, i) => {
+      const y = top + i * rowH + (rowH - barH) / 2;
+      el("text", { x: labelW, y: y + barH / 2 + 4, "text-anchor": "end", class: "lbl", text: it.label }, svg);
+      const xv = sx(it.value);
+      const a = Math.min(base, xv), b = Math.max(base, xv), w = b - a, r = Math.min(4, w);
+      let d;
+      if (it.value >= 0) d = `M${a},${y}H${b - r}Q${b},${y} ${b},${y + r}V${y + barH - r}Q${b},${y + barH} ${b - r},${y + barH}H${a}Z`;
+      else d = `M${b},${y}H${a + r}Q${a},${y} ${a},${y + r}V${y + barH - r}Q${a},${y + barH} ${a + r},${y + barH}H${b}Z`;
+      el("path", { d, fill: it.color, class: "bar" }, svg);
+      const tx = it.value >= 0 ? b + 6 : a - 6;
+      el("text", { x: tx, y: y + barH / 2 + 4, "text-anchor": it.value >= 0 ? "start" : "end", class: "val", text: it.text }, svg);
+      const hit = el("rect", { x: 0, y: top + i * rowH, width: W, height: rowH, class: "hit", tabindex: 0, "aria-label": it.label + ": " + it.text }, svg);
+      const show = (e) => showTip(e, it.label, it.tip);
+      hit.addEventListener("pointermove", show);
+      hit.addEventListener("focus", show);
+      hit.addEventListener("pointerleave", hideTip);
+      hit.addEventListener("blur", hideTip);
+    });
+    if (opts.ref !== undefined) {
+      const rx = sx(opts.ref);
+      el("line", { x1: rx, x2: rx, y1: top - 2, y2: H - axisH, stroke: css("--ink-2"), "stroke-width": 1.5 }, svg);
+    }
+  }
+
+  // ---------- line chart ----------
+  function lineChart(host, series) {
+    host.replaceChildren();
+    const W = host.clientWidth || 800, H = 280, m = { t: 12, r: 44, b: 26, l: 48 };
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, height: H, role: "img", "aria-label": "Monthly sales by year" }, host);
+    const max = niceMax(Math.max(...series.flatMap((s) => s.values)));
+    const sx = (i) => m.l + (i / 11) * (W - m.l - m.r);
+    const sy = (v) => H - m.b - (v / max) * (H - m.t - m.b);
+    for (let k = 0; k <= 4; k++) {
+      const v = (max / 4) * k;
+      el("line", { x1: m.l, x2: W - m.r, y1: sy(v), y2: sy(v), stroke: k ? css("--grid") : css("--axis"), "stroke-width": 1 }, svg);
+      el("text", { x: m.l - 8, y: sy(v) + 4, "text-anchor": "end", text: compact(v) }, svg);
+    }
+    MONTHS.forEach((mm, i) => {
+      if (W < 520 && i % 2) return;
+      el("text", { x: sx(i), y: H - 8, "text-anchor": "middle", text: mm }, svg);
+    });
+    series.forEach((s) => {
+      const d = s.values.map((v, i) => (i ? "L" : "M") + sx(i) + "," + sy(v)).join("");
+      el("path", { d, fill: "none", stroke: s.color, "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }, svg);
+      const li = 11;
+      el("circle", { cx: sx(li), cy: sy(s.values[li]), r: 4, fill: s.color, stroke: css("--surface"), "stroke-width": 2 }, svg);
+      el("text", { x: sx(li) + 8, y: sy(s.values[li]) + 4, class: "lbl", text: s.name }, svg);
+    });
+    const cross = el("line", { y1: m.t, y2: H - m.b, stroke: css("--axis"), "stroke-width": 1, visibility: "hidden" }, svg);
+    const dots = series.map((s) => el("circle", { r: 4, fill: s.color, stroke: css("--surface"), "stroke-width": 2, visibility: "hidden" }, svg));
+    const hit = el("rect", { x: m.l - 10, y: 0, width: W - m.l - m.r + 20, height: H, class: "hit", tabindex: 0, "aria-label": "Monthly sales; use arrow keys" }, svg);
+    let cur = 11;
+    const at = (i, e) => {
+      cur = i;
+      cross.setAttribute("x1", sx(i)); cross.setAttribute("x2", sx(i)); cross.setAttribute("visibility", "visible");
+      series.forEach((s, k) => { dots[k].setAttribute("cx", sx(i)); dots[k].setAttribute("cy", sy(s.values[i])); dots[k].setAttribute("visibility", "visible"); });
+      const rowsT = series.map((s) => ({ label: s.name, value: compact(s.values[i]), color: s.color }));
+      const a = series[0].values[i], b = series[1].values[i];
+      if (b > 0) rowsT.push({ label: "YoY", value: spct(a / b - 1) });
+      showTip(e, MONTHS[i], rowsT);
+    };
+    hit.addEventListener("pointermove", (e) => {
+      const r = svg.getBoundingClientRect();
+      const px = (e.clientX - r.left) * (W / r.width);
+      at(Math.max(0, Math.min(11, Math.round(((px - m.l) / (W - m.l - m.r)) * 11))), e);
+    });
+    hit.addEventListener("focus", (e) => at(cur, e));
+    hit.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+        e.preventDefault();
+        at(Math.max(0, Math.min(11, cur + (e.key === "ArrowRight" ? 1 : -1))), { target: hit, type: "focus" });
+      }
+    });
+    const off = () => { hideTip(); cross.setAttribute("visibility", "hidden"); dots.forEach((d) => d.setAttribute("visibility", "hidden")); };
+    hit.addEventListener("pointerleave", off);
+    hit.addEventListener("blur", off);
+  }
+
+  // ---------- render ----------
+  function renderKpis() {
+    const t = sum(rows({ forceOrder: true }));
+    const lfl = (yr) => sum(rows({ ignoreYear: true, forceOrder: true }).filter((r) => r[0] === yr && r[1] <= 9));
+    const a = lfl(2017), b = lfl(2016);
+    const showDelta = state.year !== "2016";
+    const dl = (cur, prev, upGood) => {
+      if (!showDelta || !prev) return null;
+      const ch = cur / prev - 1;
+      return { text: spct(ch), cls: (ch >= 0) === upGood ? "up" : "down" };
+    };
+    const disc = 1 - t.s / t.l, discA = 1 - a.s / a.l, discB = 1 - b.s / b.l;
+    const tiles = [
+      { label: "Total sales", value: compact(t.s), d: dl(a.s, b.s, true) },
+      { label: "Units sold", value: compact(t.q), d: dl(a.q, b.q, true) },
+      { label: "Average selling price (ASP)", value: int(t.s / t.q), d: dl(a.s / a.q, b.s / b.q, true) },
+      { label: "Discount vs list price", value: pct(disc), d: showDelta ? { text: ((discA - discB) >= 0 ? "+" : "−") + Math.abs((discA - discB) * 100).toFixed(1) + " pts", cls: "" } : null },
+    ];
+    const host = document.getElementById("kpis");
+    host.replaceChildren();
+    tiles.forEach((k) => {
+      const c = el("div", { class: "card kpi" }, host);
+      el("div", { class: "label", text: k.label }, c);
+      el("div", { class: "value", text: k.value }, c);
+      const d = el("div", { class: "delta" }, c);
+      if (k.d) {
+        const b2 = el("b", { class: k.d.cls, text: k.d.text }, d);
+        d.appendChild(document.createTextNode(" Jan–Sep YoY (like-for-like)"));
+        void b2;
+      } else d.textContent = state.year === "2016" ? "First year of data" : " ";
+    });
+  }
+
+  function renderTrend() {
+    const rs = rows({ ignoreYear: true });
+    const by = (yr) => MONTHS.map((_, i) => rs.filter((r) => r[0] === yr && r[1] === i + 1).reduce((s, r) => s + r[4], 0));
+    const s17 = by(2017), s16 = by(2016);
+    const c17 = css("--accent"), c16 = css("--context");
+    const basis = state.basis === "payment" ? "payment date" : "order date";
+    document.getElementById("trend-sub").textContent = `Sales by ${basis} · 2017 highlighted, 2016 for context`;
+    const lg = document.getElementById("trend-legend");
+    lg.replaceChildren();
+    [["2017", c17], ["2016", c16]].forEach(([n, c]) => { const s = el("span", {}, lg); el("i", { class: "key-line", style: "background:" + c }, s); s.appendChild(document.createTextNode(n)); });
+    lineChart(document.getElementById("trend"), [{ name: "2017", values: s17, color: c17 }, { name: "2016", values: s16, color: c16 }]);
+    table(document.getElementById("trend-table"), ["Month", "2016", "2017", "YoY"],
+      MONTHS.map((mm, i) => [mm, int(s16[i]), int(s17[i]), s16[i] ? spct(s17[i] / s16[i] - 1) : "–"]));
+  }
+
+  function renderCities() {
+    const rs = rows();
+    const tot = sum(rs).s;
+    const g = [...groupBy(rs, (r) => r[2])].map(([id, v]) => ({ id, t: sum(v) })).sort((a, b) => b.t.s - a.t.s);
+    const max = niceMax(Math.max(1, ...g.map((x) => x.t.s)));
+    hbars(document.getElementById("cities"), g.map((x) => ({
+      label: cityById[x.id].city, value: x.t.s, color: css("--accent"),
+      text: compact(x.t.s) + " · " + pct(x.t.s / tot, 0),
+      tip: [{ label: "Sales", value: compact(x.t.s) }, { label: "Share", value: pct(x.t.s / tot) }, { label: "Units", value: int(x.t.q) }],
+    })), { max, ticks: [0, max / 2, max], fmtAxis: compact, aria: "Sales by city" });
+    table(document.getElementById("cities-table"), ["City", "Country", "Sales", "Share", "Units"],
+      g.map((x) => [cityById[x.id].city, cityById[x.id].country, int(x.t.s), pct(x.t.s / tot), int(x.t.q)]));
+  }
+
+  function renderYoy() {
+    const rs = rows({ ignoreYear: true, forceOrder: true }).filter((r) => r[1] <= 9);
+    const g = [...groupBy(rs, (r) => r[2])].map(([id, v]) => {
+      const a = sum(v.filter((r) => r[0] === 2017)).s, b = sum(v.filter((r) => r[0] === 2016)).s;
+      return { id, a, b, ch: b ? a / b - 1 : 0 };
+    }).sort((x, y) => y.ch - x.ch);
+    const lim = Math.max(0.2, ...g.map((x) => Math.abs(x.ch)));
+    const m = Math.ceil(lim * 10) / 10;
+    hbars(document.getElementById("yoy"), g.map((x) => ({
+      label: cityById[x.id].city + (PARTIAL_BASE[x.id] ? " *" : ""), value: x.ch,
+      color: x.ch >= 0 ? css("--pos") : css("--neg"), text: spct(x.ch, 0),
+      tip: [{ label: "Jan–Sep 2017", value: compact(x.a) }, { label: "Jan–Sep 2016", value: compact(x.b) }, { label: "YoY", value: spct(x.ch) }],
+    })), { min: -m, max: m, ticks: [-m, 0, m], fmtAxis: (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(Math.round(v * 100)) + "%", aria: "Like-for-like growth by city" });
+    table(document.getElementById("yoy-table"), ["City", "Jan–Sep 2016", "Jan–Sep 2017", "YoY"],
+      g.map((x) => [cityById[x.id].city, int(x.b), int(x.a), spct(x.ch)]));
+  }
+
+  function renderPrice() {
+    const rs = rows({ forceOrder: true });
+    const g = [...groupBy(rs, (r) => r[2])].map(([id, v]) => ({ id, t: sum(v) }))
+      .map((x) => ({ ...x, ratio: x.t.s / x.t.l })).sort((a, b) => b.ratio - a.ratio);
+    const max = Math.max(1.5, Math.ceil(Math.max(...g.map((x) => x.ratio)) * 2) / 2);
+    hbars(document.getElementById("price"), g.map((x) => ({
+      label: cityById[x.id].city, value: x.ratio, color: css("--accent"), text: pct(x.ratio, 0),
+      tip: [{ label: "ASP", value: int(x.t.s / x.t.q) }, { label: "Price ÷ list", value: pct(x.ratio) }, { label: "Discount", value: pct(1 - x.ratio) }],
+    })), { max, ref: 1, ticks: [0, 1, max], fmtAxis: (v) => Math.round(v * 100) + "%", aria: "Average price as % of list price by city" });
+    table(document.getElementById("price-table"), ["City", "ASP", "Price ÷ list", "Discount %"],
+      g.map((x) => [cityById[x.id].city, int(x.t.s / x.t.q), pct(x.ratio), pct(1 - x.ratio)]));
+  }
+
+  function renderProducts() {
+    const rs = rows();
+    const tot = sum(rs).s;
+    const g = [...groupBy(rs, (r) => r[3])].map(([id, v]) => ({ id, t: sum(v) })).sort((a, b) => b.t.s - a.t.s);
+    const max = niceMax(Math.max(1, ...g.map((x) => x.t.s)));
+    const lg = document.getElementById("prod-legend");
+    lg.replaceChildren();
+    Object.keys(catColor).forEach((c) => { const s = el("span", {}, lg); el("i", { class: "key-rect", style: "background:" + css(catColor[c]) }, s); s.appendChild(document.createTextNode(c)); });
+    hbars(document.getElementById("products"), g.map((x) => {
+      const p = prodById[x.id];
+      return {
+        label: p.name, value: x.t.s, color: css(catColor[p.category]), text: compact(x.t.s) + " · " + pct(x.t.s / tot, 0),
+        tip: [{ label: "Category", value: p.category }, { label: "Sales", value: compact(x.t.s) }, { label: "ASP", value: int(x.t.s / x.t.q) }, { label: "Discount", value: pct(1 - x.t.s / x.t.l) }],
+      };
+    }), { max, ticks: [0, max / 2, max], fmtAxis: compact, aria: "Sales by product" });
+    table(document.getElementById("products-table"), ["Product", "Category", "Sales", "Share", "ASP", "List price", "Discount %"],
+      g.map((x) => { const p = prodById[x.id]; return [p.name, p.category, int(x.t.s), pct(x.t.s / tot), int(x.t.s / x.t.q), int(p.list_price), pct(1 - x.t.s / x.t.l)]; }));
+  }
+
+  function renderTI() {
+    const yr = state.year === "2016" ? 2016 : 2017;
+    const rs = rows({ ignoreYear: true });
+    const month = (y, mo) => rs.filter((r) => r[0] === y && r[1] === mo).reduce((s, r) => s + r[4], 0);
+    let ytd = 0, ytdLy = 0;
+    const body = MONTHS.map((mm, i) => {
+      const cur = month(yr, i + 1), ly = month(yr - 1, i + 1);
+      ytd += cur; ytdLy += ly;
+      return [mm + " " + yr, int(cur), int(ytd), yr > 2016 ? int(ly) : "–", yr > 2016 ? int(ytdLy) : "–", yr > 2016 && ly ? spct(cur / ly - 1) : "–"];
+    });
+    document.getElementById("ti-sub").textContent = `${yr} by ${state.basis === "payment" ? "payment" : "order"} date · SPLY = same month in ${yr - 1}`;
+    table(document.getElementById("ti"), ["Month", "Sales (MTD)", "Sales YTD", "SPLY", "YTD SPLY", "YoY"], body);
+  }
+
+  function renderAll() {
+    renderKpis(); renderTrend(); renderCities(); renderYoy(); renderPrice(); renderProducts(); renderTI();
+  }
+
+  function init(data) {
+    D = data;
+    cityById = Object.fromEntries(D.cities.map((c) => [c.id, c]));
+    prodById = Object.fromEntries(D.products.map((p) => [p.id, p]));
+    const cats = [...new Set(D.products.map((p) => p.category))].sort();
+    catColor = Object.fromEntries(cats.map((c, i) => [c, "--cat-" + (i + 1)]));
+    const conts = [...new Set(D.cities.map((c) => c.continent))].sort();
+    const fc = document.getElementById("f-continent");
+    conts.forEach((c) => el("option", { value: c, text: c }, fc));
+    const fk = document.getElementById("f-category");
+    cats.forEach((c) => el("option", { value: c, text: c }, fk));
+    document.getElementById("f-year").addEventListener("change", (e) => { state.year = e.target.value; renderAll(); });
+    fc.addEventListener("change", (e) => { state.continent = e.target.value; renderAll(); });
+    fk.addEventListener("change", (e) => { state.category = e.target.value; renderAll(); });
+    document.querySelectorAll("#f-basis button").forEach((b) => b.addEventListener("click", () => {
+      state.basis = b.dataset.v;
+      document.querySelectorAll("#f-basis button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+      renderAll();
+    }));
+    renderAll();
+    let t;
+    window.addEventListener("resize", () => { clearTimeout(t); t = setTimeout(renderAll, 120); });
+    if (window.matchMedia) window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", renderAll);
+  }
+
+  fetch("data.json").then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(init)
+    .catch(() => { document.getElementById("err").style.display = "block"; });
+})();
+</script>
+</body>
+</html>

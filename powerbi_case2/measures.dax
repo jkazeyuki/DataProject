@@ -1,0 +1,90 @@
+// ============================================================
+// Case 2 — DAX measures. Create an empty table "_Measures"
+// (Home → Enter data → OK) and add each measure there.
+//
+// Relationships (Model view):
+//   FactSales[Product ID]   * → 1 DimProducts[Code]
+//   FactSales[IDCity]       * → 1 DimGeo[IDCity]
+//   FactSales[Order Date]   * → 1 DimCalendar[Dates]   (ACTIVE)
+//   FactSales[Payment Date] * → 1 DimCalendar[Dates]   (INACTIVE — dashed line)
+// Mark DimCalendar as date table (Table tools → Mark as date table → Dates).
+// Sort DimCalendar[Month Name] by [Month Num], [Month Yr] by [MonthYearNum].
+// ============================================================
+
+// ---------- Base ----------
+Total Sales = SUM ( FactSales[Sales Amount] )
+
+Total Units = SUM ( FactSales[Quantity] )
+
+Orders = COUNTROWS ( FactSales )
+
+// Revenue at list price: row-by-row Quantity × List Price
+Total Sales ListPrice =
+SUMX ( FactSales, FactSales[Quantity] * RELATED ( DimProducts[List Price] ) )
+
+// ---------- Price ----------
+ASP = DIVIDE ( [Total Sales], [Total Units] )
+
+// Positive = sold below list; negative = sold above list
+Discount % = 1 - DIVIDE ( [Total Sales], [Total Sales ListPrice] )
+
+Price vs List % = DIVIDE ( [Total Sales], [Total Sales ListPrice] )
+
+// ---------- Time intelligence (on the active Order Date relationship) ----------
+Sales MTD = TOTALMTD ( [Total Sales], DimCalendar[Dates] )
+
+Sales YTD = TOTALYTD ( [Total Sales], DimCalendar[Dates] )
+
+Sales SPLY = CALCULATE ( [Total Sales], SAMEPERIODLASTYEAR ( DimCalendar[Dates] ) )
+
+Sales YTD SPLY = CALCULATE ( [Sales YTD], SAMEPERIODLASTYEAR ( DimCalendar[Dates] ) )
+
+Sales YoY % = DIVIDE ( [Total Sales] - [Sales SPLY], [Sales SPLY] )
+
+Sales LM = CALCULATE ( [Total Sales], PREVIOUSMONTH ( DimCalendar[Dates] ) )
+
+Sales NM = CALCULATE ( [Total Sales], NEXTMONTH ( DimCalendar[Dates] ) )
+
+// Like-for-like: same months in both years (data ends mid-Dec 2017 and
+// SF / Vancouver stop earlier, so full-year 2017 vs 2016 is misleading)
+Sales LFL Jan-Sep =
+CALCULATE ( [Total Sales], DimCalendar[Month Num] <= 9 )
+
+Sales LFL YoY % =
+VAR _cur = CALCULATE ( [Sales LFL Jan-Sep], DimCalendar[Year] = 2017 )
+VAR _prev = CALCULATE ( [Sales LFL Jan-Sep], DimCalendar[Year] = 2016 )
+RETURN DIVIDE ( _cur - _prev, _prev )
+
+// ---------- Role-playing date ----------
+Sales By Order Date = [Total Sales]
+
+Sales By Payment Date =
+CALCULATE (
+    [Total Sales],
+    USERELATIONSHIP ( FactSales[Payment Date], DimCalendar[Dates] )
+)
+
+// ---------- Dynamic measure (slicer on disconnected Indicator table) ----------
+Sales LY = CALCULATE ( [Total Sales], SAMEPERIODLASTYEAR ( DimCalendar[Dates] ) )
+
+Dynamic Measure =
+SWITCH (
+    SELECTEDVALUE ( Indicator[IndicatorName], "TotalSales" ),
+    "TotalSales", [Total Sales],
+    "TotalSalesByOrderDate", [Sales By Order Date],
+    "TotalSalesByPaymentDate", [Sales By Payment Date],
+    "TotalSalesLY", [Sales LY]
+)
+
+Dynamic Title =
+SELECTEDVALUE ( Indicator[IndicatorName], "TotalSales" ) & " by month"
+
+// ---------- Share / ranking (for titles and tables) ----------
+Sales Share % =
+DIVIDE ( [Total Sales], CALCULATE ( [Total Sales], ALL ( DimGeo ), ALL ( DimProducts ) ) )
+
+City Rank =
+RANKX ( ALL ( DimGeo[City] ), [Total Sales], , DESC, DENSE )
+
+// Conditional-format colour for YoY bars / KPI deltas
+YoY Colour = IF ( [Sales LFL YoY %] >= 0, "#2A78D6", "#E34948" )

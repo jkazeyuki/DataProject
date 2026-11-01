@@ -18,7 +18,7 @@
 
 | Metric                      | Value                                                           |
 | --------------------------- | --------------------------------------------------------------- |
-| Content days complete       | **2 / 10** (Days 1–2)                                           |
+| Content days complete       | **3 / 10** (Days 1–3)                                           |
 | Setup (Day 0)               | Done                                                            |
 | Working days elapsed        | 6 (Thu May 28 → Thu Jun 4)                                      |
 | Pace                        | ~0.33 project days / working day (target: **1.0**)              |
@@ -26,8 +26,8 @@
 | Project days remaining      | 8 (Days 3–10)                                                   |
 | Status                      | **Behind** — need ~1.6 project days/day, or extend the deadline |
 
-<progress value="2" max="10" title="2 of 10 content days complete"></progress>  
-*20% of content days done (Day 0 not counted above).*
+<progress value="3" max="10" title="3 of 10 content days complete"></progress>  
+*30% of content days done (Day 0 not counted above).*
 
 ### Daily log
 
@@ -42,7 +42,7 @@ Update this row each evening. One line per calendar day — even if you only mad
 | Jun 2     | Tue     | Day 1   | In progress | Completed **1.4** (UNNEST worked examples)                    |
 | Jun 3     | Wed     | Day 1   | Done        | Finished Day 1 — `data_dictionary.md`, profiling SQL          |
 | Jun 4     | Thu     | Day 2   | Done        | KPI tree, `metric_definitions.md`, `baseline_metrics.sql`     |
-| Jun 5     | Fri     | Day 3   | —           | *Today*                                                       |
+| Jun 5     | Fri     | Day 3   | Done        | Trend decomposition + `findings_memo.md` (completed Oct 27): returning-user rate effect = 77% of RPS drop |
 |           |         |         |             |                                                               |
 
 ### Deliverable checklist
@@ -54,7 +54,7 @@ Check off when the day's **Done when** criteria are met (see each day section be
 | 0 | BQ + repo + Colab + Looker working | Done |
 | 1 | `docs/data_dictionary.md` + `sql/01_data_profiling.sql` | Done |
 | 2 | `docs/metric_definitions.md` + `sql/02_baseline_metrics.sql` | Done |
-| 3 | `docs/findings_memo.md` + `sql/03_trend_decomposition.sql` | — |
+| 3 | `docs/findings_memo.md` + `sql/03_trend_decomposition.sql` | Done |
 | 4 | `sql/04_funnel_analysis.sql` + funnel chart | — |
 | 5 | `python/segmentation.ipynb` | — |
 | 6 | `dashboard/wireframe.png` + Power BI data model ([Power BI track](powerbi/README.md)) | — |
