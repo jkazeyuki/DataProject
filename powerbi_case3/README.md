@@ -14,6 +14,7 @@ from 2018 to 2020 across 29 business lines in 6 countries, with every amount swi
 | File | What it is |
 |---|---|
 | `README.md` (this file) | 3-day plan, explanation, step-by-step build, insights, publishing |
+| [`BUILD_IT_YOURSELF.md`](BUILD_IT_YOURSELF.md) | Workbook version: goals, hidden hints and checks, so you build the case on your own |
 | [`DAY_BY_DAY.md`](DAY_BY_DAY.md) | Click-by-click walkthrough for each day, with checkpoints and troubleshooting |
 | [`MATCH_THE_SOLUTION.md`](MATCH_THE_SOLUTION.md) | Exact positions, colours and fonts to make the report look like the solution, with reference pictures in [`design/`](design/) and an importable theme |
 | [`build_data.py`](build_data.py) | Rebuilds `docs/case3/data.json` for the web version from the 5 Excel files |
