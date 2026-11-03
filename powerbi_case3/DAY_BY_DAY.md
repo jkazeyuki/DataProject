@@ -250,6 +250,9 @@ Add everything in README §6.3: `ASP`, `TotalSales YTD`, `TotalSales LY`, `Total
 Then optionally add README §6.4 (`Sales Allproduct`, `Market Share%`, `Expected Sales by List Price`).
 
 ### Step 2.4: Theme and page frame (30 min)
+
+> **Want it to look exactly like the solution?** Follow [MATCH_THE_SOLUTION.md](MATCH_THE_SOLUTION.md)
+> instead of Steps 2.4–2.8. It has every position, colour and font, plus reference pictures.
 1. `View → Themes` → pick a clean built-in theme (e.g. *Classic* or *Innovate*). Keep it simple.
 2. Rename the page: double-click the **Page 1** tab at the bottom → `OVERVIEW`.
 3. `Format page` (paintbrush with no visual selected) → **Canvas settings** → Type *16:9* (1280 × 720).

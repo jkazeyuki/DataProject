@@ -1,0 +1,20 @@
+{
+  "name": "YourFashion (Case 3)",
+  "dataColors": [
+    "#dfd3c6",
+    "#5b738f",
+    "#7c8ca4",
+    "#9b8658",
+    "#c4b08d",
+    "#ece4d8",
+    "#798aa3",
+    "#A66999",
+    "#3599B8",
+    "#DFBFBF",
+    "#4AC5BB",
+    "#5F6B6D"
+  ],
+  "background": "#FFFFFF",
+  "foreground": "#4584D3",
+  "tableAccent": "#31B6FD"
+}

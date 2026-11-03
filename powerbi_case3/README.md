@@ -15,6 +15,7 @@ from 2018 to 2020 across 29 business lines in 6 countries, with every amount swi
 |---|---|
 | `README.md` (this file) | 3-day plan, explanation, step-by-step build, insights, publishing |
 | [`DAY_BY_DAY.md`](DAY_BY_DAY.md) | Click-by-click walkthrough for each day, with checkpoints and troubleshooting |
+| [`MATCH_THE_SOLUTION.md`](MATCH_THE_SOLUTION.md) | Exact positions, colours and fonts to make the report look like the solution, with reference pictures in [`design/`](design/) and an importable theme |
 | [`build_data.py`](build_data.py) | Rebuilds `docs/case3/data.json` for the web version from the 5 Excel files |
 | [`../docs/case3/index.html`](../docs/case3/index.html) | Interactive web dashboard (the resume link) |
 | `YourFashion_Sales.pbix` | *(you create this)* the Power BI report |
